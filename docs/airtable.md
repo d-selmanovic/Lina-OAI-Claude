@@ -33,7 +33,16 @@ Eine Unterlage gilt als **vorhanden**, wenn das Dateifeld **nicht leer** ist **o
 | Führerschein (Datei) | `Vozačka dozvola (prilog)` (`fldthIhgrw3T3ChPF`) | – | nein [Startwert] |
 
 ### Anruf 1: Angaben für die Eignungsprüfung [Startwert]
-Lina fragt **nur die leeren** dieser Felder ab, in dieser Reihenfolge:
+
+**Grundregel: Ein Feld wird nur abgefragt, wenn es (a) als „abfragen“ markiert ist UND (b) leer ist.** Vorhandenes wird nie erneut abgefragt.
+
+**„Leer“ heißt** [Startwert]: leer oder nur Leerzeichen, „-“ oder „?“. Alles andere zählt als vorhanden.
+
+**Vorhanden ist ein Wert auch, wenn er schon in `Dopune` wartet:** Der Fetch lädt zusätzlich die verknüpften `Dopune`-Einträge (Link-Feld `Dopune` `fldK7uywuxbPhzjGH`), deren `Status pregleda` **nicht** „Odbačeno“ ist. Ist das entsprechende Feld dort gefüllt, gilt es als vorhanden. Damit fragt Lina auch bei einem zweiten Anruf nichts doppelt ab.
+
+**Im Gespräch:** Was der Kandidat schon beantwortet hat, auch ungefragt, wird nicht noch einmal gefragt.
+
+Felder, in dieser Reihenfolge:
 
 | Angabe | Feld in `Prijave (test)` (ID) |
 |---|---|
