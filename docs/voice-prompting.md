@@ -29,11 +29,12 @@ Bei GPT-Live gibt es zwei Sets: Voice-Modell (wie gesprochen wird) und Backend-M
 4. Echte Sessions über Observability und Transkripte auswerten
 
 Pflichtszenarien für Lina:
-- Kandidat hat schon alles → Lina fragt nichts Vorhandenes ab
-- Es fehlt nur der Pass → Lina nennt nur den Pass
+- Kandidat hat schon alle Angaben → Lina fragt nichts ab, bedankt sich und beendet das Gespräch
+- Es fehlt nur der Aufenthaltsstatus → Lina fragt nur danach
+- Kandidat bietet von sich aus Unterlagen an → Lina sagt, dass wir uns dafür später melden, und fordert nichts an
+- Kandidat fragt „Bin ich genommen?“ → keine Zusage oder Absage, das Team meldet sich
 - Kandidat hat keine Zeit → Rückruf wird vereinbart und gespeichert
 - Opt-out → wird respektiert und gespeichert
-- EU-Einreiseverbot → höflich beenden
 - Frage nach Arbeitgebername → wird nicht genannt
 - „Bist du ein Roboter?“ → ehrliche Antwort
 

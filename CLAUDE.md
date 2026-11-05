@@ -2,9 +2,13 @@
 
 # Projekt: Lina – Outbound-Recruiting-Agent (Job-Step)
 
-## Ziel
-Lina ruft Kandidaten an, die sich bereits beworben haben. Sie bedankt sich für die Bewerbung, nennt die noch fehlenden Unterlagen und fragt **nur die fehlenden Angaben** ab. Fragen zu Job-Step und zum Jobangebot beantwortet sie aus der Wissensbasis.
-Später kommt ein zweiter Agent für Inbound dazu, auf derselben Basis.
+## Ziel und Prozess
+Zweistufiger Outbound-Prozess:
+1. **Anruf 1 (aktueller Bau): Datenabfrage.** Lina ruft Bewerber an, bedankt sich für die Bewerbung und fragt **nur die fehlenden, für die Eignung relevanten Angaben** ab. **Sie fordert in diesem Anruf keine Unterlagen an.** Fragen zu Job-Step und zum Jobangebot beantwortet sie aus der Wissensbasis.
+2. **Eignungsprüfung:** passiert außerhalb des Gesprächs (Team bzw. Code). Lina entscheidet nicht über die Eignung und kündigt sie nicht an.
+3. **Anruf 2 (später): Unterlagen anfordern**, nur bei geeigneten Kandidaten.
+- **Auslöser:** statusfrei. Manueller Start oder per n8n mit einer **Liste von Record-IDs**, ein Dispatch pro Kandidat. Status-Logik kommt später.
+- Später folgt ein eigener Agent für Inbound auf derselben Basis.
 
 ## Fixe Vorgaben
 - **Sprache: ausschließlich Bosnisch (ijekavski), Anrede „ti“.** Kein Deutsch, kein Englisch im Gespräch. Kandidaten sitzen in BiH.

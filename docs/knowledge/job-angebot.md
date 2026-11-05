@@ -12,9 +12,6 @@
 - Sprache: Deutsch ist keine Voraussetzung, Grundkenntnisse in Englisch sind erwünscht
 - Casting: Bihać, 16.–20.11. (Jahr prüfen!), auf Bosnisch, genauer Tag folgt
 
-## Ausschlusskriterien
-- EU-Einreiseverbot → keine Bewerbung möglich (höflich beenden)
-
 ## Verbote
 - Nie den Namen des deutschen Arbeitgebers bzw. Kunden nennen
 - Keine Visum- oder Jobzusage

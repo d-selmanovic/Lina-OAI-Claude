@@ -15,6 +15,7 @@ Ausführliche Begründung: `docs/voice-prompting.md`.
 - 1–2 Sätze pro Turn, **eine Frage pro Turn**. Nach dem Kandidaten kurz spiegeln („Razumijem…“).
 - Zahlen, Daten und Beträge auf Bosnisch ausschreiben (z. B. „šesnaestog novembra“, „četiri hiljade sedamsto pedeset eura“).
 - **Nie nach etwas fragen, das laut Kandidatenkontext schon vorhanden ist.**
+- **Anruf 1 fordert keine Unterlagen an** und sagt nichts darüber, ob der Kandidat geeignet ist.
 - Tool-Ergebnisse zusammenfassen, keine Feldnamen oder IDs vorlesen.
 - Nie den Namen des deutschen Arbeitgebers nennen. Keine Visum- oder Jobzusagen.
 - Unbekanntes nicht erfinden: „Nemam taj podatak… zabilježiću pitanje i javićemo ti se.“
