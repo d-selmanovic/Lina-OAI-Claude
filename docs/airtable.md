@@ -66,17 +66,20 @@ Felder, in dieser Reihenfolge:
 **Statusfrei.** Ein manueller oder n8n-Trigger übergibt eine Liste von Record-IDs, je ID ein Dispatch. Status-Filter kommen später.
 
 ## Neue Felder (vorgeschlagen, noch NICHT angelegt, wartet auf Freigabe)
+Geprüft am 05.11.2026: Keiner der Namen existiert in der Zieltabelle. Bestehende Felder werden nicht verändert. Die Maske zeigt nur fest eingestellte Felder und bleibt deshalb unverändert.
+
 | Tabelle | Feld | Typ |
 |---|---|---|
 | Prijave (test) und Dopune | `Djeca` | Auswahl Da / Ne |
 | Prijave (test) und Dopune | `Broj djece` | Zahl |
 | Prijave (test) und Dopune | `Dob djece` | Text (z. B. „4, 9“) |
-| Prijave (test) und Dopune | `Njemački – nivo` | Auswahl Nema / Osnove (A1–A2) / Srednje (B1–B2) / Napredno (C1–C2). Neu angelegt, das bestehende Freitextfeld bleibt unverändert |
+| Prijave (test) und Dopune | `Njemački – nivo` | Auswahl (siehe `docs/feldwerte.md`). Neues Feld, `Poznavanje njemačkog jezika` bleibt unverändert |
 | Prijave (test) und Dopune | `Engleski – nivo` | Auswahl wie oben |
 | Radno iskustvo | `Izvor podatka` | Auswahl Lina (nije provjereno) / Forma / Recruiter |
 | Radno iskustvo | `Napomena provjere` | Langtext (Hinweise aus `provjeri_podatke`) |
 | Obrazovanje | `Izvor podatka` | Auswahl wie oben |
 | Obrazovanje | `Smjer / zanimanje` | Text |
+| Obrazovanje | `Stepen obrazovanja` | Auswahl (siehe `docs/feldwerte.md`) |
 
 ## Mehrfache Erfahrung und Ausbildung (Option B, entschieden)
 - Lina legt pro Station **einen neuen Datensatz** an: in `Radno iskustvo` (`tblbRG7v8pTRqVTqH`, Felder `Pozicija`, `Poslodavac`, `Od`, `Do`, `Aktuelno`, `Grad`, `Država`, `Opis`, Link `Kandidat veza` `fldZQZunKe7uh3Crr`) bzw. in `Obrazovanje` (`tblyAQ6ud95RW76Ym`, Felder `Škola`, `Adresa škole`, `Od`, `Do`, Link `Kandidat` `fldkiFDfqWQCmF0RQ`).

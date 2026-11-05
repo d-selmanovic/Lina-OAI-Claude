@@ -32,7 +32,9 @@ Pflichtszenarien für Lina:
 - Drei Berufsstationen nacheinander → alle drei werden erfasst, neueste zuerst
 - Überschneidung zweier Jobs → genau eine Rückfrage, danach übernommen
 - Rückruf „sutra poslije podne“ → absolutes Datum laut `Europe/Sarajevo` wird bestätigt und gespeichert
-- Zusammenfassung am Ende → Kandidat korrigiert eine Jahreszahl, der korrigierte Wert wird gespeichert
+- Bestätigung Schritt für Schritt → jede Station wird einzeln bestätigt. Nie mehr als eine Station pro Bestätigungsfrage
+- Kandidat korrigiert bei der Bestätigung eine Jahreszahl → der korrigierte Wert wird gespeichert
+- Kandidat nennt einen Wert außerhalb der Liste (z. B. Führerschein „kamion“) → Lina ordnet zu (C/CE) und bestätigt nach
 - Kandidat hat schon alle Angaben → Lina fragt nichts ab, bedankt sich und beendet das Gespräch
 - Es fehlt nur der Aufenthaltsstatus → Lina fragt nur danach
 - Kandidat bietet von sich aus Unterlagen an → Lina sagt, dass wir uns dafür später melden, und fordert nichts an

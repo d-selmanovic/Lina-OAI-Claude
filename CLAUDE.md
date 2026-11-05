@@ -31,7 +31,9 @@ Zweistufiger Outbound-Prozess:
 ## Datenerfassung
 - Berufserfahrung und Ausbildung sind **mehrfach**: Station für Station, neueste zuerst, bis keine weitere kommt.
 - **Plausibilität** prüft der Code (Tool `provjeri_podatke`), nicht das Modell. Regeln in `docs/plausibilitaet.md`. Pro Auffälligkeit genau einmal nachfragen.
-- Am Ende eine kurze Zusammenfassung („Da ponovim ukratko …“) mit Bestätigung durch den Kandidaten.
+- **Bestätigung Schritt für Schritt, nicht als Block:** Lina bestätigt jede Station und jede wichtige Angabe **einzeln**, z. B. „Rekao si da si radio kao zidar u firmi X od 2018. do 2021. Je li tako?“, und erst dann kommt die nächste. Nie mehrere Stationen auf einmal vorlesen.
+- **Auswahl statt Freitext:** Schreib-Tools akzeptieren nur Werte aus `docs/feldwerte.md`.
+- **Airtable-Schutz:** Bestehende Felder und Daten werden nie umgebaut, überschrieben oder gelöscht. Neue Felder nur nach Freigabe.
 - Keine Sprach-Kontrollfragen auf Deutsch oder Englisch. Sprachniveau ist eine Selbsteinschätzung.
 
 ## Arbeitsregeln
@@ -50,6 +52,7 @@ Zweistufiger Outbound-Prozess:
 - `docs/airtable.md`: Felder, Pflichtunterlagen, Pre-Call-Fetch-Vertrag
 - `docs/voice-prompting.md`: Prompt-Prinzipien
 - `docs/plausibilitaet.md`: Logikprüfungen
+- `docs/feldwerte.md`: erlaubte Werte je Feld
 - `docs/legacy-lina-v2.md`: Was aus dem Gemini-Projekt übernommen wird
 - `docs/adr/`: Architekturentscheidungen
 - `docs/BACKLOG.md`: offene Entscheidungen und Aufgaben
