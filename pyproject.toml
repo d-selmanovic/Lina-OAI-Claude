@@ -35,6 +35,7 @@ where = ["src"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 88
@@ -42,7 +43,7 @@ target-version = "py39"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "B", "A", "C4", "UP", "SIM", "RUF"]
-ignore = ["E501"]  # Line too long (handled by formatter)
+ignore = ["E501", "RUF001", "RUF002", "RUF003"]  # E501: Formatter; RUF00x: Gedankenstrich „–“ ist in Airtable-Werten gewollt
 
 [tool.ruff.format]
 quote-style = "double"

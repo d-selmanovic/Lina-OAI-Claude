@@ -98,6 +98,11 @@ Lina schreibt **nicht direkt** in `Prijave (test)`. **Personendaten** gehen nach
 
 Gesprächsergebnisse: `erreicht` · `rückruf` · `kein_interesse` · `opt_out` · `nicht_erreicht` · `falsche_person`
 
+## Umsetzung (Stand Code 05.11.2026)
+- Werte ohne eigenes Airtable-Feld (Deutsch- und Englisch-Niveau, Kinder, Smjer/Stepen der Schule, Erklärungen zu Logikprüfungen, Gesprächsergebnis, Zusammenfassung) stehen bis zum Anlegen der neuen Spalten als Notiz in `Dopune` → `Opis iskustva ili obrazovanja`.
+- Gespräche ohne erfasste Angabe und ohne Ergebnis erzeugen keinen Dopune-Eintrag.
+- Jede Tabelle wird pro Gespräch höchstens einmal geschrieben. Bei einem Fehler holt das Sitzungsende nur fehlende Tabellen nach.
+
 ## Pre-Call-Fetch-Vertrag
 1. Der Trigger (manuell oder n8n) übergibt pro Kandidat `record_id` als Dispatch-Metadaten.
 2. Der Entrypoint lädt den Record **vor** `session.start` (Timeout, Fehler → kein Gespräch).

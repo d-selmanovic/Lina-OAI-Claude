@@ -24,10 +24,11 @@
 ## Aufgaben (Reihenfolge)
 0. [ ] Neue Airtable-Felder anlegen (Liste in `docs/airtable.md`), **nach Freigabe**
 1. [ ] Airtable-Schema über den Connector auslesen → `docs/airtable.md` aktualisieren
-2. [ ] Szenarien für die Pflichtfälle in `scenarios.yaml` (siehe `docs/voice-prompting.md`)
-3. [ ] Pre-Call-Fetch (Anruf 1), Write-Tools (`Dopune`, `Radno iskustvo`, `Obrazovanje`), `provjeri_podatke`, `trenutno_vrijeme`, mit Test-Record
-4. [ ] Erster Entwurf der Instruktionen (Voice und Backend), GPT-Live per Inference
-5. [ ] Test mit `lk agent debugger` und `lk agent console`
+2. [x] Szenarien: `scenarios.yaml` (7, mit Endzustand) und `scenarios-guardrails.yaml` (6)
+3. [x] Pre-Call-Fetch, Write-Tools, `provjeri_podatke`, `trenutno_vrijeme` – Fetch gegen K-0196 getestet (nur lesend), Schreiben nur mit Fake-Store getestet
+4. [x] Erster Entwurf der Instruktionen (Voice bosnisch, Backend englisch), GPT-Live per Inference
+5. [ ] Test mit `lk agent debugger --audio` und `lk agent dev` (Console) – siehe `docs/TESTEN.md`
+5a. [ ] Erster echter Schreibtest gegen Airtable (K-0196), danach Testeinträge aufräumen
 6. [ ] Feinschliff Persona, Wissen und Einwände
 7. [ ] SIP-Outbound
 8. [ ] Später: Inbound-Agent

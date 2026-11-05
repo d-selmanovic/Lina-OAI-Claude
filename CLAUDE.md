@@ -47,7 +47,16 @@ Zweistufiger Outbound-Prozess:
 - Kandidatendaten sind personenbezogen: keine Namen, Telefonnummern oder Dokumentinhalte in Logs. Nur Record-IDs loggen.
 - Keys nur in `.env.local` (gitignored). Nie in Code, Commits oder Chat.
 
+## Code-Struktur
+- `src/agent.py`: Einstieg (Kandidat bestimmen → Pre-Call-Fetch → GPT-Live-Session → Speichern beim Ende)
+- `src/lina/config.py`: alle Airtable-IDs und der Fragenkatalog `PITANJA` (Reihenfolge, `abfragen=False` schaltet eine Frage ab)
+- `src/lina/kontekst.py`: „nur wenn leer“ inkl. Dopune · `plausibilitaet.py`: L1–L10 · `werte.py`: erlaubte Werte
+- `src/lina/agent_lina.py`: Tools · `prompts.py`: Instruktionen (Voice bosnisch, Backend englisch)
+- `src/lina/airtable.py`: Lesen und Schreiben · `simulacija.py`: Szenarien-Daten und Endzustands-Prüfung
+- `docs/knowledge/znanje-lina.md`: Wissen, das Lina sagen darf (bosnisch, wird in die Instruktionen geladen)
+
 ## Projektdokumente
+- `docs/TESTEN.md`: Tests, Debugger, Console, Simulationen
 - `docs/knowledge/jobstep.md`, `docs/knowledge/job-angebot.md`: Wissensbasis (Entwurf, wird überarbeitet)
 - `docs/airtable.md`: Felder, Pflichtunterlagen, Pre-Call-Fetch-Vertrag
 - `docs/voice-prompting.md`: Prompt-Prinzipien

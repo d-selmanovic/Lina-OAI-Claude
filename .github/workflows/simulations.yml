@@ -1,7 +1,8 @@
 # Runs the scenarios in scenarios.yaml against your agent on LiveKit Cloud.
 # Simulations spend real inference, so this runs on merges to main and on demand
 # rather than on every pull request push. Run
-# `lk agent simulate text --scenarios scenarios.yaml` locally while iterating.
+# `lk agent simulate audio --scenarios scenarios.yaml` locally while iterating.
+# Lina nutzt GPT-Live (audio-only) → Simulationen laufen im Audio-Modus.
 name: Simulations
 
 on:
@@ -43,4 +44,6 @@ jobs:
       run: curl -sSL https://get.livekit.io/cli | bash
 
     - name: Run simulations
-      run: lk agent simulate text --scenarios scenarios.yaml
+      run: |
+        lk agent simulate audio --scenarios scenarios.yaml
+        lk agent simulate audio --scenarios scenarios-guardrails.yaml
