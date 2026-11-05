@@ -45,6 +45,7 @@ Zweistufiger Outbound-Prozess:
 
 ## Datenschutz und Secrets
 - Kandidatendaten sind personenbezogen: keine Namen, Telefonnummern oder Dokumentinhalte in Logs. Nur Record-IDs loggen.
+- Ausnahme mit Absicht: Langfuse speichert vollständige Gespräche (`LANGFUSE_INHALTE=1`, Entscheidung Denis 05.11.2026) zur Absicherung.
 - Keys nur in `.env.local` (gitignored). Nie in Code, Commits oder Chat.
 
 ## Code-Struktur

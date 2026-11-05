@@ -31,6 +31,7 @@ from lina.airtable import AirtableStore, FakeStore, Store, sacuvaj
 from lina.kontekst import izracunaj
 from lina.simulacija import paket_iz_userdata, razlike
 from lina.stanje import Stanje
+from lina.telemetrie import setup_langfuse
 from lina.zeit import TZ, opis
 
 logger = logging.getLogger("agent")
@@ -89,6 +90,17 @@ async def my_agent(ctx: JobContext):
         store = AirtableStore()
 
     ctx.log_context_fields = {"room": ctx.room.name, "record_id": record_id}
+
+    # Langfuse (optional): vor dem Sessionstart, damit alle Spans ankommen.
+    trace_provider = setup_langfuse(
+        metadata={"langfuse.session.id": ctx.room.name, "lina.record_id": record_id}
+    )
+    if trace_provider is not None:
+
+        async def flush_trace() -> None:
+            trace_provider.force_flush()
+
+        ctx.add_shutdown_callback(flush_trace)
 
     # Pre-Call-Fetch: VOR dem Sessionstart. Ohne Kontext wird nicht telefoniert.
     try:

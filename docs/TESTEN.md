@@ -26,7 +26,9 @@ print(izracunaj('rec17GODhyD0Lkgzp',p.kandidat,p.dopune,p.radno_iskustvo,p.obraz
 ```
 Erwartet: Liste der fehlenden Angaben, **ohne** `drzavljanstvo` (bei K-0196 eingetragen).
 
-## 3. Agent-Debugger (Audio)
+## 3. Agent-Debugger (Audio, nur Text-Ausgabe)
+Der Debugger spricht deinen Text ein, du **hörst aber nichts**: Er zeigt nur Transkript und Tools.
+Zum Hören Schritt 4 nutzen.
 ```bash
 lk agent debugger start src/agent.py --audio
 lk agent debugger say "Halo?"
@@ -41,11 +43,18 @@ Achte auf: bosnische Antworten, eine Frage pro Turn, Tool-Calls (`sacuvaj_podata
 neuen Eintrag in `Dopune` (und ggf. `Radno iskustvo` / `Obrazovanje`) – verknüpft mit dem
 Test-Kandidaten K-0196. Diese Testeinträge danach in Airtable löschen oder auf „Odbačeno“ setzen.
 
-## 4. Mit Lina sprechen (Mikrofon, Browser)
+## 4. Mit Lina sprechen (Mikrofon, Browser – hier hörst du sie)
 ```bash
 lk agent dev
 ```
-Den ausgegebenen Agent-Console-Link öffnen und sprechen.
+Den ausgegebenen Agent-Console-Link öffnen, Mikrofon erlauben und sprechen.
+Nach dem Deploy geht das auch direkt in der Agent Console der Cloud (siehe `docs/DEPLOY.md`).
+
+## 4a. Langfuse prüfen
+Mit gesetzten `LANGFUSE_*`-Variablen erscheinen die Traces pro Gespräch (Session = Raumname).
+Entscheidung (05.11.2026): **alles inkl. Gesprächsinhalte** (`LANGFUSE_INHALTE=1`): Transkripte,
+Tool-Argumente, Instruktionen plus Dauer, Tool-Aufrufe und Kosten. Das sind Personendaten der Kandidaten.
+Ist im LiveKit-Projekt „PII redaction“ aktiv, entfernt LiveKit die Inhalte trotzdem.
 
 ## 5. Simulationen (kosten Inferenz)
 ```bash

@@ -72,3 +72,26 @@ def test_endzustand_pruefung():
     assert razlike(st, {"sacuvano": ["engleski"]})  # fehlt → Fehler
     run(a.sacuvaj_podatak(None, "drzavljanstvo", "BiH"))
     assert razlike(st, {"nije_sacuvano": ["drzavljanstvo"]})  # doppelt erfasst → Fehler
+
+
+def test_langfuse_ohne_keys_aus(monkeypatch):
+    from lina.telemetrie import setup_langfuse
+
+    for k in ("LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY", "LANGFUSE_BASE_URL"):
+        monkeypatch.delenv(k, raising=False)
+    assert setup_langfuse() is None
+
+
+def test_langfuse_mit_keys_ohne_inhalte(monkeypatch):
+    from lina import telemetrie
+
+    gesehen = {}
+    monkeypatch.setenv("LANGFUSE_PUBLIC_KEY", "pk-lf-test")
+    monkeypatch.setenv("LANGFUSE_SECRET_KEY", "sk-lf-test")
+    monkeypatch.setenv("LANGFUSE_BASE_URL", "https://cloud.langfuse.com")
+    monkeypatch.delenv("LANGFUSE_INHALTE", raising=False)
+    import livekit.agents.telemetry as t
+
+    monkeypatch.setattr(t, "set_tracer_provider", lambda p, **kw: gesehen.update(kw))
+    assert telemetrie.setup_langfuse({"x": "y"}) is not None
+    assert gesehen["allow_pii"] is False
