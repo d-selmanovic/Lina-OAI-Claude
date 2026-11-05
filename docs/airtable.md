@@ -112,5 +112,5 @@ Gesprächsergebnisse: `erreicht` · `rückruf` · `kein_interesse` · `opt_out` 
 
 ## Offen
 - Alle [Startwert]-Punkte bestätigen
-- Test-Datensatz in `Prijave (test)` anlegen (z. B. Name mit „test“, die Formel `Test oznaka (po imenu)` markiert ihn), Entwicklung nur damit
+- **Test-Datensatz angelegt (05.11.2026):** „Test Lina“, `K-0196`, Record `rec17GODhyD0Lkgzp`. Die Formel `Test oznaka` zeigt „Moguć test“. Entwicklung **nur** mit diesem Datensatz. Die Telefonnummer trägt Denis selbst ein.
 - Airtable-Token: Scopes `data.records:read`, `data.records:write`, `schema.bases:read`, **nur** Base `appz3VFomHaWhuILV`
