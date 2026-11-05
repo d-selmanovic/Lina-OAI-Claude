@@ -15,7 +15,8 @@
 - [ ] **Anrufzeiten** und Wiederholversuche
 
 ## Entschieden (05.11.2026)
-- Mehrfache Erfahrung und Ausbildung: Option B (direkt in `Radno iskustvo` / `Obrazovanje`, markiert)
+- Mehrfache Erfahrung und Ausbildung: Option B (direkt in `Radno iskustvo` / `Obrazovanje`)
+- Vorerst NICHT: berechnete Berufsjahre, Markierung „nije provjereno“
 - Alle Plausibilitätsregeln L1–L10 inklusive Lücken-Regel
 - Keine Sprach-Kontrollfrage
 - Zeitzone `Europe/Sarajevo`

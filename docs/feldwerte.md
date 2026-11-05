@@ -20,6 +20,5 @@ Freitext bleibt nur, wo eine Liste nicht sinnvoll ist: Firmenname, Position, Sch
 | Stepen obrazovanja (neu, Obrazovanje) | `Osnovna škola` · `Srednja – 3 godine (KV)` · `Srednja – 4 godine` · `Viša/Fakultet` · `Kurs/obuka` |
 | Država (Radno iskustvo) | Liste wie Državljanstvo plus `Njemačka, Austrija, Švicarska` · sonst `Drugo – <država>` |
 | Aktuelno (Radno iskustvo) | Checkbox |
-| Izvor podatka (neu) | `Lina (nije provjereno)` · `Forma` · `Recruiter` |
 
 Datumsangaben: `Od`/`Do` als Datum. Ist nur das Jahr bekannt, gilt der 01.01. bzw. 31.12. des Jahres, mit dem Vermerk `approx` in `Napomena provjere`.

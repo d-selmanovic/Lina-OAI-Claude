@@ -75,21 +75,18 @@ Geprüft am 05.11.2026: Keiner der Namen existiert in der Zieltabelle. Bestehend
 | Prijave (test) und Dopune | `Dob djece` | Text (z. B. „4, 9“) |
 | Prijave (test) und Dopune | `Njemački – nivo` | Auswahl (siehe `docs/feldwerte.md`). Neues Feld, `Poznavanje njemačkog jezika` bleibt unverändert |
 | Prijave (test) und Dopune | `Engleski – nivo` | Auswahl wie oben |
-| Radno iskustvo | `Izvor podatka` | Auswahl Lina (nije provjereno) / Forma / Recruiter |
 | Radno iskustvo | `Napomena provjere` | Langtext (Hinweise aus `provjeri_podatke`) |
-| Obrazovanje | `Izvor podatka` | Auswahl wie oben |
 | Obrazovanje | `Smjer / zanimanje` | Text |
 | Obrazovanje | `Stepen obrazovanja` | Auswahl (siehe `docs/feldwerte.md`) |
 
 ## Mehrfache Erfahrung und Ausbildung (Option B, entschieden)
 - Lina legt pro Station **einen neuen Datensatz** an: in `Radno iskustvo` (`tblbRG7v8pTRqVTqH`, Felder `Pozicija`, `Poslodavac`, `Od`, `Do`, `Aktuelno`, `Grad`, `Država`, `Opis`, Link `Kandidat veza` `fldZQZunKe7uh3Crr`) bzw. in `Obrazovanje` (`tblyAQ6ud95RW76Ym`, Felder `Škola`, `Adresa škole`, `Od`, `Do`, Link `Kandidat` `fldkiFDfqWQCmF0RQ`).
-- Jeder Datensatz bekommt `Izvor podatka` = „Lina (nije provjereno)“. Das Team prüft über diesen Filter.
 - **„Leer“** bedeutet für diese Bereiche: Es gibt noch keinen verknüpften Datensatz. Gibt es schon Einträge, liest Lina sie vor und fragt nur: „Je li to sve, ili ima još nešto?“
 - Bestehende Datensätze überschreibt Lina nie.
 
 ## Schreiben (nach dem Gespräch) [Startwert]
 
-Lina schreibt **nicht direkt** in `Prijave (test)`. **Personendaten** gehen nach `Dopune` (Prüfung durchs Team), **Erfahrung und Ausbildung** als neue, markierte Datensätze in `Radno iskustvo` bzw. `Obrazovanje` (siehe oben).
+Lina schreibt **nicht direkt** in `Prijave (test)`. **Personendaten** gehen nach `Dopune` (Prüfung durchs Team), **Erfahrung und Ausbildung** als neue Datensätze in `Radno iskustvo` bzw. `Obrazovanje` (siehe oben).
 
 1. **Neuer Datensatz in `Dopune`** (`tblzvtVFXZHFgk8mq`):
    - `Kandidat` (`fldDZ1Ik9Xq7vm0f3`) → Link auf genau den geladenen Record
