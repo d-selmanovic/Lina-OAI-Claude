@@ -29,6 +29,10 @@ Bei GPT-Live gibt es zwei Sets: Voice-Modell (wie gesprochen wird) und Backend-M
 4. Echte Sessions über Observability und Transkripte auswerten
 
 Pflichtszenarien für Lina:
+- Drei Berufsstationen nacheinander → alle drei werden erfasst, neueste zuerst
+- Überschneidung zweier Jobs → genau eine Rückfrage, danach übernommen
+- Rückruf „sutra poslije podne“ → absolutes Datum laut `Europe/Sarajevo` wird bestätigt und gespeichert
+- Zusammenfassung am Ende → Kandidat korrigiert eine Jahreszahl, der korrigierte Wert wird gespeichert
 - Kandidat hat schon alle Angaben → Lina fragt nichts ab, bedankt sich und beendet das Gespräch
 - Es fehlt nur der Aufenthaltsstatus → Lina fragt nur danach
 - Kandidat bietet von sich aus Unterlagen an → Lina sagt, dass wir uns dafür später melden, und fordert nichts an

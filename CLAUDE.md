@@ -23,6 +23,17 @@ Zweistufiger Outbound-Prozess:
 - **So wenige Handoffs wie möglich.** Bei GPT-Live startet ein Handoff eine neue Session.
 - **Wissen** (Job-Step, Jobangebot) liegt in `docs/knowledge/` und wird von dort in die Instruktionen geladen, nicht im Code dupliziert.
 
+## Datum und Zeit
+- Zeitzone **`Europe/Sarajevo`** (MEZ/MESZ, Sommerzeit automatisch). **Nie fest „UTC+1“ setzen.**
+- Der Entrypoint gibt beim Start das aktuelle Datum, den Wochentag und die Uhrzeit in `Europe/Sarajevo` an die Instruktionen. Zusätzlich gibt es das Tool `trenutno_vrijeme` für lange Gespräche, Rückrufe und relative Angaben wie „sutra“ oder „za dvije sedmice“.
+- Rückruftermine immer als absolutes Datum mit Uhrzeit speichern und dem Kandidaten auf Bosnisch bestätigen.
+
+## Datenerfassung
+- Berufserfahrung und Ausbildung sind **mehrfach**: Station für Station, neueste zuerst, bis keine weitere kommt.
+- **Plausibilität** prüft der Code (Tool `provjeri_podatke`), nicht das Modell. Regeln in `docs/plausibilitaet.md`. Pro Auffälligkeit genau einmal nachfragen.
+- Am Ende eine kurze Zusammenfassung („Da ponovim ukratko …“) mit Bestätigung durch den Kandidaten.
+- Keine Sprach-Kontrollfragen auf Deutsch oder Englisch. Sprachniveau ist eine Selbsteinschätzung.
+
 ## Arbeitsregeln
 - LiveKit entwickelt sich schnell: APIs, CLI-Flags, Modelle und Preise immer zuerst prüfen (Skill `reading-livekit-docs` bzw. `lk docs`), nie aus dem Gedächtnis antworten.
 - Belegte Fakten, Schlussfolgerungen und Annahmen trennen. Unsicherheit benennen.
@@ -38,6 +49,7 @@ Zweistufiger Outbound-Prozess:
 - `docs/knowledge/jobstep.md`, `docs/knowledge/job-angebot.md`: Wissensbasis (Entwurf, wird überarbeitet)
 - `docs/airtable.md`: Felder, Pflichtunterlagen, Pre-Call-Fetch-Vertrag
 - `docs/voice-prompting.md`: Prompt-Prinzipien
+- `docs/plausibilitaet.md`: Logikprüfungen
 - `docs/legacy-lina-v2.md`: Was aus dem Gemini-Projekt übernommen wird
 - `docs/adr/`: Architekturentscheidungen
 - `docs/BACKLOG.md`: offene Entscheidungen und Aufgaben
