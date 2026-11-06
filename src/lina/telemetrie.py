@@ -19,8 +19,21 @@ from opentelemetry.util.types import AttributeValue
 logger = logging.getLogger("lina.telemetrie")
 
 
+def umgebung() -> str:
+    """Langfuse-Environment: LINA_ENV (z. B. "lokal") > LiveKit-Deployment (z. B. "staging")
+    > "production". LIVEKIT_AGENT_DEPLOYMENT ist in der Cloud für production leer."""
+    env = (
+        os.environ.get("LINA_ENV")
+        or os.environ.get("LIVEKIT_AGENT_DEPLOYMENT")
+        or "production"
+    )
+    env = "".join(c if c.isalnum() or c in "-_" else "-" for c in env.lower())[:40]
+    return env if env and not env.startswith("langfuse") else "production"
+
+
 def setup_langfuse(metadata: dict[str, AttributeValue] | None = None):
-    """Gibt den TracerProvider zurück oder None, wenn Langfuse nicht konfiguriert ist."""
+    """Gibt (TracerProvider, DialogProzessor) zurück oder None, wenn Langfuse nicht
+    konfiguriert ist."""
     pk = os.environ.get("LANGFUSE_PUBLIC_KEY")
     sk = os.environ.get("LANGFUSE_SECRET_KEY")
     base = os.environ.get("LANGFUSE_BASE_URL")
@@ -38,9 +51,21 @@ def setup_langfuse(metadata: dict[str, AttributeValue] | None = None):
         endpoint=f"{base.rstrip('/')}/api/public/otel/v1/traces",
         headers={"Authorization": f"Basic {auth}", "x-langfuse-ingestion-version": "4"},
     )
-    provider = TracerProvider()
-    provider.add_span_processor(BatchSpanProcessor(exporter))
+    from .dialog import LangfuseDialogProzessor
+
     inhalte = os.environ.get("LANGFUSE_INHALTE", "0") == "1"
-    set_tracer_provider(provider, metadata=metadata, allow_pii=inhalte)
-    logger.info("Langfuse-Tracing aktiv (Inhalte: %s)", "ja" if inhalte else "nein")
-    return provider
+    provider = TracerProvider()
+    # Reihenfolge wichtig: der Dialog-Prozessor ergänzt/maskiert im on_end, BEVOR der
+    # BatchSpanProcessor exportiert (LiveKits PII-Filter wird ohnehin ganz vorne eingefügt).
+    dialog = LangfuseDialogProzessor(inhalte=inhalte)
+    provider.add_span_processor(dialog)
+    provider.add_span_processor(BatchSpanProcessor(exporter))
+    meta: dict[str, AttributeValue] = {"langfuse.environment": umgebung()}
+    meta.update(metadata or {})
+    set_tracer_provider(provider, metadata=meta, allow_pii=inhalte)
+    logger.info(
+        "Langfuse-Tracing aktiv (Inhalte: %s, Umgebung: %s)",
+        "ja" if inhalte else "nein",
+        meta["langfuse.environment"],
+    )
+    return provider, dialog

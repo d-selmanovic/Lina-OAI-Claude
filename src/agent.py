@@ -16,6 +16,8 @@ from dotenv import load_dotenv
 from livekit.agents import (
     AgentServer,
     AgentSession,
+    CloseEvent,
+    ConversationItemAddedEvent,
     JobContext,
     SimulationContext,
     cli,
@@ -28,10 +30,11 @@ from livekit.plugins import ai_coustics
 from lina import prompts
 from lina.agent_lina import LinaAgent
 from lina.airtable import AirtableStore, FakeStore, Store, sacuvaj
+from lina.dialog import DialogProtokoll
 from lina.kontekst import izracunaj
 from lina.simulacija import paket_iz_userdata, razlike
 from lina.stanje import Stanje
-from lina.telemetrie import setup_langfuse
+from lina.telemetrie import setup_langfuse, umgebung
 from lina.zeit import TZ, opis
 
 logger = logging.getLogger("agent")
@@ -92,8 +95,11 @@ async def my_agent(ctx: JobContext):
     ctx.log_context_fields = {"room": ctx.room.name, "record_id": record_id}
 
     # Langfuse (optional): vor dem Sessionstart, damit alle Spans ankommen.
-    trace_provider = setup_langfuse(
+    langfuse = setup_langfuse(
         metadata={"langfuse.session.id": ctx.room.name, "lina.record_id": record_id}
+    )
+    trace_provider, dialog_prozessor = (
+        langfuse if langfuse is not None else (None, None)
     )
     if trace_provider is not None:
 
@@ -131,6 +137,32 @@ async def my_agent(ctx: JobContext):
         vad=inference.VAD(model="silero"),
         userdata=stanje,
     )
+
+    # Gesprächsverlauf beider Seiten für Langfuse (Kandidat + Lina), siehe lina/dialog.py
+    protokoll = DialogProtokoll()
+    if dialog_prozessor is not None:
+        dialog_prozessor.binde(
+            protokoll,
+            {
+                "record_id": record_id,
+                "umgebung": umgebung(),
+                "anzahl_fehlender_angaben": len(kontekst.nedostaje),
+            },
+        )
+
+    @session.on("conversation_item_added")
+    def _dialog_item(ev: ConversationItemAddedEvent) -> None:
+        protokoll.dodaj(ev.item)
+
+    @session.on("close")
+    def _dialog_kraj(ev: CloseEvent) -> None:
+        # läuft vor dem Ende des agent_session-Spans, der den ganzen Dialog bekommt
+        protokoll.abschluss = {
+            "ishod": stanje.ishod or "prekinuto",
+            "sazetak": stanje.sazetak,
+            "razlog_kraja": str(getattr(ev, "reason", "") or ""),
+        }
+        protokoll.beendet = True
 
     async def spremi_na_kraju() -> None:
         if stanje.sacuvano:
