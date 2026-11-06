@@ -7,6 +7,7 @@ Kandidat: Dispatch-Metadaten `{"record_id": "rec..."}`. Nur zum lokalen Testen o
 gilt `LINA_TEST_RECORD_ID` (Test-Kandidat K-0196).
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -67,6 +68,13 @@ async def on_simulation_end(sim: SimulationContext) -> None:
         sim.fail(reason="Session wurde nicht gestartet")
         return
     stanje: Stanje = session.userdata
+    # GPT-Live delegiert asynchron: Die Simulation endet oft mit Linas Abschiedssatz, bevor das
+    # Backend die letzten Angaben gespeichert hat. Kurz warten, bis der Abschluss gemeldet ist.
+    for _ in range(20):
+        if stanje.ishod is not None:
+            break
+        await asyncio.sleep(0.5)
+    await asyncio.sleep(1.0)
     if fehler := razlike(stanje, expected):
         sim.fail(reason="; ".join(fehler))
 
