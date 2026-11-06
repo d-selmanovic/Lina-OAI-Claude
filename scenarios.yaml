@@ -17,8 +17,10 @@ scenarios:
       3. Wenn nach etwas anderem gefragt wird (Staatsbürgerschaft, Führerschein, E-Mail, Arbeit, Schule), antworte "to sam već poslao u prijavi".
       4. Verabschiede dich, wenn Lina sich verabschiedet.
     agent_expectations: >
-      Lina speaks Bosnian (ijekavian, informal "ti"), one short question at a time. She asks ONLY about
-      residence status, English level and children. She does NOT ask about citizenship, driving licence,
+      Lina speaks Bosnian (ijekavian, informal "ti"), one short question at a time. She asks about
+      residence status, English level and children. She may ask ONCE whether there is more work
+      experience or schooling besides what is on file, and accepts "already in the application"
+      immediately without insisting. She does NOT ask about citizenship, driving licence,
       e-mail, work experience or school, because these are already on file. She asks for no documents.
     tags:
       feature: samo_prazno
@@ -99,7 +101,8 @@ scenarios:
       4. Alle anderen Fragen kurz und plausibel beantworten.
     agent_expectations: >
       Lina asks for work experience station by station, starting with the current job, and asks
-      "A prije toga?" until the candidate says there is nothing more. After EACH station she repeats only
+      whether there was a job before that (e.g. "A prije toga?", wording may vary) until the
+      candidate says there is nothing more. After EACH station she repeats only
       that one station and asks for confirmation; she never reads several stations back at once.
     tags:
       feature: radno_iskustvo
@@ -163,7 +166,7 @@ scenarios:
   - id: SCN_0dUUXmGe2zsW
     label: Opt-out sofort respektieren
     instructions: |
-      PERSONA: Genervter Kandidat, spricht Bosnisch.
+      PERSONA: Genervter Kandidat, spricht Kroatisch (hrvatski).
       OPENING LINE: "Halo?"
       DO, IN ORDER:
       1. Nach der Begrüßung: "Ne zanima me više, nemojte me više zvati."
