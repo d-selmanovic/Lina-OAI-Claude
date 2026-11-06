@@ -19,6 +19,21 @@ from opentelemetry.util.types import AttributeValue
 logger = logging.getLogger("lina.telemetrie")
 
 
+def lina_version() -> str:
+    """Version aus pyproject.toml (einzige Stelle, die gepflegt wird)."""
+    from pathlib import Path
+
+    try:
+        import tomllib  # ab Python 3.11
+
+        pfad = Path(__file__).resolve().parents[2] / "pyproject.toml"
+        return str(
+            tomllib.loads(pfad.read_text(encoding="utf-8"))["project"]["version"]
+        )
+    except Exception:
+        return "unbekannt"
+
+
 def umgebung() -> str:
     """Langfuse-Environment: LINA_ENV (z. B. "lokal") > LiveKit-Deployment (z. B. "staging")
     > "production". LIVEKIT_AGENT_DEPLOYMENT ist in der Cloud für production leer."""
@@ -60,12 +75,18 @@ def setup_langfuse(metadata: dict[str, AttributeValue] | None = None):
     dialog = LangfuseDialogProzessor(inhalte=inhalte)
     provider.add_span_processor(dialog)
     provider.add_span_processor(BatchSpanProcessor(exporter))
-    meta: dict[str, AttributeValue] = {"langfuse.environment": umgebung()}
+    version = lina_version()
+    meta: dict[str, AttributeValue] = {
+        "langfuse.environment": umgebung(),
+        "langfuse.release": version,
+        "lina.version": version,
+    }
     meta.update(metadata or {})
     set_tracer_provider(provider, metadata=meta, allow_pii=inhalte)
     logger.info(
-        "Langfuse-Tracing aktiv (Inhalte: %s, Umgebung: %s)",
+        "Langfuse-Tracing aktiv (Inhalte: %s, Umgebung: %s, Version: %s)",
         "ja" if inhalte else "nein",
         meta["langfuse.environment"],
+        version,
     )
     return provider, dialog

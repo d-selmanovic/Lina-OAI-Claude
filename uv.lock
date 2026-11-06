@@ -14,7 +14,7 @@ constraints = [{ name = "yarl", specifier = "<1.24" }]
 
 [[package]]
 name = "agent-starter-python"
-version = "1.0.0"
+version = "0.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "livekit-agents" },

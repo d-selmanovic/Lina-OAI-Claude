@@ -44,5 +44,25 @@ Secrets ändern: `lk agent update-secrets --secrets-file .env.cloud` (Befehl vor
   ```
 - **Langfuse:** Traces unter dem Raumnamen (`langfuse.session.id`).
 
+## Ablauf bei jeder Änderung (production = Original, staging = Tester)
+1. **Ändern auf `dev`**: `git switch dev`, Tests: `uv run pytest -q && uv run ruff check src tests`.
+2. **Version hochzählen** in `pyproject.toml` UND `uv lock` ausführen (sonst bricht der Cloud-Build
+   wegen `uv sync --locked` ab), Eintrag in `CHANGELOG.md`, committen, `git push`.
+3. **Auf den Tester**: `lk agent deploy --deployment staging`. Prüfen: Testanruf mit
+   `--deployment staging`, Simulation, Langfuse (Environment `staging`, Release = Version).
+4. **Freigabe nur nach „bestätige“**:
+   ```bash
+   git switch main && git merge dev && git push
+   git tag -a vX.Y.Z -m "…" && git push origin vX.Y.Z
+   lk agent promote --deployment staging
+   ```
+5. **Notieren**: LiveKit-Version aus `lk agent status` in `CHANGELOG.md` eintragen.
+
+Wichtig:
+- Befehle einzeln ausführen, nie als Block einfügen (sonst läuft `promote` ungewollt mit).
+- `lk agent delete` nie ohne `--deployment staging` (sonst ist das Original weg).
+- Testanrufe ohne `--deployment` gehen an das Original.
+
 ## Rollback
-Im Build-Plan gibt es kein Instant-Rollback. Notfalls älteren Commit auschecken und `lk agent deploy`.
+Ship-Plan: `lk agent rollback` (Optionen mit `lk agent rollback --help` prüfen; Versions-IDs in `CHANGELOG.md`).
+Notfalls älteren Git-Tag auschecken und `lk agent deploy`.

@@ -137,3 +137,10 @@ def test_fehler_in_anreicherung_stoert_nicht():
     with tr.start_as_current_span("agent_turn"):
         pass
     assert len(_attrs(exp, "agent_turn")) == 1
+
+
+def test_version_aus_pyproject():
+    from lina.telemetrie import lina_version
+
+    v = lina_version()
+    assert v != "unbekannt" and v.count(".") == 2
