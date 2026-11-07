@@ -171,13 +171,7 @@ async def my_agent(ctx: JobContext):
         ),
     )
     await ctx.connect()
-
-    handle = session.generate_reply(
-        instructions="Pozdravi kandidata kako piše u uputama i pitaj ima li par minuta."
-    )
-    await handle
-    if handle.exception() is not None:
-        logger.info("Modell hat die Begrüßung nicht gestartet")
+    # Nicht sofort reden: warten, bis der Angerufene sich meldet (Halo / Da?).
 
 
 if __name__ == "__main__":

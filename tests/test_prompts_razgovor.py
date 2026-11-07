@@ -37,3 +37,9 @@ def test_backend_samo_nedostajuce_polja():
     assert "Podaci koji NEDOSTAJU" in BACKEND
     assert "Never store or ask for a field" in BACKEND
     assert "sacuvaj_podatak" in BACKEND
+
+
+def test_voice_cekaj_javljanje_pa_identitet():
+    assert "Ne govori ništa dok on" in VOICE
+    assert "Govorim li sa" in VOICE
+    assert "generate_reply" not in VOICE
