@@ -1,3 +1,7 @@
+---
+title: Znanje za Linu (NACRT)
+---
+
 # Znanje za Linu (NACRT)
 
 > Status: NACRT iz Lina v2 (`prompts.py`). Opis posla se još prerađuje (vidi `job-angebot.md`).

@@ -1,3 +1,7 @@
+---
+title: "Telefonie: LiveKit → FusionPBX → TG400 → SIM"
+---
+
 # Telefonie: LiveKit → FusionPBX → TG400 → SIM
 
 Stand 06.11.2026, erster erfolgreicher Testanruf. Keine Passwörter in dieser Datei.

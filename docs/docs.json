@@ -17,6 +17,18 @@
       {
         "group": "Logik",
         "pages": ["airtable", "feldwerte", "plausibilitaet", "voice-prompting"]
+      },
+      {
+        "group": "Wissen",
+        "pages": ["knowledge/jobstep", "knowledge/job-angebot", "knowledge/znanje-lina"]
+      },
+      {
+        "group": "Architektur",
+        "pages": ["adr/README", "adr/0001-gpt-live-betrieb", "adr/0000-template", "legacy-lina-v2"]
+      },
+      {
+        "group": "Planung",
+        "pages": ["BACKLOG"]
       }
     ]
   }

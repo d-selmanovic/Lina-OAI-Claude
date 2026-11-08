@@ -1,3 +1,7 @@
+---
+title: "ADR 0001: GPT-Live-Betrieb über LiveKit Inference"
+---
+
 # ADR 0001: GPT-Live-Betrieb über LiveKit Inference
 
 - **Status:** Vorschlag (wartet auf Bestätigung)

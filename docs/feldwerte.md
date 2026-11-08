@@ -1,3 +1,7 @@
+---
+title: Feste Werte (Auswahl statt Freitext)
+---
+
 # Feste Werte (Auswahl statt Freitext)
 
 **Prinzip:** Linas Schreib-Tools akzeptieren nur Werte aus diesen Listen (Enum im Tool-Schema). In Airtable landen sie als einheitlicher Text bzw. in neuen Auswahlfeldern.
