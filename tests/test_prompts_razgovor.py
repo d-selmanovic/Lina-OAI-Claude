@@ -43,3 +43,10 @@ def test_voice_cekaj_javljanje_pa_identitet():
     assert "Ne govori ništa dok on" in VOICE
     assert "Govorim li sa" in VOICE
     assert "generate_reply" not in VOICE
+
+
+def test_voice_ablauf_skakanje_smalltalk():
+    assert "Red na listi je orijentacija" in VOICE
+    assert "Small talk smije usred razgovora" in VOICE
+    assert "Ne poslije svakog posla" in VOICE
+    assert "bez SSML" in VOICE
