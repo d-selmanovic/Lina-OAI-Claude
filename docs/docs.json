@@ -1,0 +1,23 @@
+{
+  "$schema": "https://context7.com/schema/docs7.json",
+  "name": "Lina Voice",
+  "colors": {
+    "primary": "#16A34A"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Start",
+        "pages": ["index"]
+      },
+      {
+        "group": "Betrieb",
+        "pages": ["TESTEN", "DEPLOY", "TELEFONIE"]
+      },
+      {
+        "group": "Logik",
+        "pages": ["airtable", "feldwerte", "plausibilitaet", "voice-prompting"]
+      }
+    ]
+  }
+}
