@@ -1,6 +1,6 @@
 """Vertrags-Tests für Voice-Instructions (Gesprächsführung, kein LiveKit)."""
 
-from lina.prompts import BACKEND, VOICE
+from lina.prompts import BACKEND, VOICE, VOICE_POZDRAV
 
 
 def test_voice_keine_fragebogen_floskeln():
@@ -40,9 +40,11 @@ def test_backend_samo_nedostajuce_polja():
 
 
 def test_voice_cekaj_javljanje_pa_identitet():
-    assert "Ne govori ništa dok on" in VOICE
-    assert "Govorim li sa" in VOICE
+    assert "Ne govori ništa dok on" in VOICE_POZDRAV
+    assert "Govorim li sa" in VOICE_POZDRAV
     assert "generate_reply" not in VOICE
+    assert "generate_reply" not in VOICE_POZDRAV
+    assert "nastavi_prikupljanje" in VOICE_POZDRAV
 
 
 def test_voice_ablauf_skakanje_smalltalk():
@@ -50,3 +52,4 @@ def test_voice_ablauf_skakanje_smalltalk():
     assert "Small talk smije usred razgovora" in VOICE
     assert "Ne poslije svakog posla" in VOICE
     assert "bez SSML" in VOICE
+    assert "predji_na_kraj" in VOICE

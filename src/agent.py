@@ -14,6 +14,7 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 from livekit.agents import (
+    AMD,
     AgentServer,
     AgentSession,
     JobContext,
@@ -26,7 +27,7 @@ from livekit.agents.beta import EndCallTool
 from livekit.plugins import ai_coustics
 
 from lina import prompts
-from lina.agent_lina import LinaAgent
+from lina.agent_lina import PozdravAgent
 from lina.airtable import AirtableStore, FakeStore, Store, sacuvaj
 from lina.kontekst import izracunaj
 from lina.simulacija import paket_iz_userdata, razlike
@@ -152,11 +153,13 @@ async def my_agent(ctx: JobContext):
 
     ctx.add_shutdown_callback(spremi_na_kraju)
 
-    agent = LinaAgent(
-        instructions=prompts.voice(kontekst, vrijeme),
+    extra = [EndCallTool(end_instructions=None, ignore_on_enter=True)]
+    agent = PozdravAgent(
         stanje=stanje,
         store=store,
-        tools=[EndCallTool(end_instructions=None, ignore_on_enter=True)],
+        kontekst=kontekst,
+        vrijeme=vrijeme,
+        tools=extra,
     )
 
     await session.start(
@@ -172,6 +175,29 @@ async def my_agent(ctx: JobContext):
     )
     await ctx.connect()
     # Nicht sofort reden: warten, bis der Angerufene sich meldet (Halo / Da?).
+    if ctx.simulation_context():
+        return
+    try:
+        async with AMD(session, ivr_detection=False) as detector:
+            amd = await detector.execute()
+        logger.info("AMD category=%s", amd.category)
+        if amd.category == "machine-vm":
+            handle = session.generate_reply(
+                instructions=(
+                    "Govori bosanski, kratko, bez tagova. Reci da je Lina iz Job-Stepa "
+                    "zvala i da ćemo se javiti. Onda šuti."
+                )
+            )
+            await handle.wait_for_playout()
+            stanje.ishod = stanje.ishod or "prekinuto"
+            ctx.shutdown(reason="voicemail")
+            return
+        if amd.category == "machine-unavailable":
+            stanje.ishod = stanje.ishod or "prekinuto"
+            ctx.shutdown(reason="mailbox unavailable")
+            return
+    except Exception:
+        logger.exception("AMD fehlgeschlagen – weiter wie Mensch")
 
 
 if __name__ == "__main__":

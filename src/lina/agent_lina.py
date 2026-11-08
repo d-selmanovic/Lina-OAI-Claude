@@ -10,10 +10,10 @@ from typing import Literal
 
 from livekit.agents import Agent, RunContext, function_tool
 
-from . import werte
+from . import prompts, werte
 from .airtable import Store, sacuvaj
 from .datumi import parse_datum
-from .kontekst import Skola, Stanica
+from .kontekst import Kontekst, Skola, Stanica
 from .plausibilitaet import provjeri
 from .stanje import Ishod, Stanje
 from .zeit import opis, parse_termin
@@ -68,10 +68,18 @@ class LinaAgent(Agent):
         stanje: Stanje,
         store: Store,
         tools: list | None = None,
+        chat_ctx=None,
+        kontekst: Kontekst | None = None,
+        vrijeme: str = "",
     ) -> None:
-        super().__init__(instructions=instructions, tools=tools or [])
+        kw = {}
+        if chat_ctx is not None:
+            kw["chat_ctx"] = chat_ctx
+        super().__init__(instructions=instructions, tools=tools or [], **kw)
         self.stanje = stanje
         self.store = store
+        self.kontekst = kontekst if kontekst is not None else stanje.kontekst
+        self.vrijeme = vrijeme
 
     # ---------- einzelne Angaben ----------
 
@@ -324,4 +332,125 @@ class LinaAgent(Agent):
                 "Speichern fehlgeschlagen für %s", self.stanje.kontekst.record_id
             )
             return "Spremanje nije uspjelo, ali se ljubazno oprosti od kandidata. Kolege će provjeriti."
+        return "Sačuvano. Zahvali se, ljubazno se oprosti i pozovi end_call."
+
+    @function_tool
+    async def predji_na_kraj(self, context: RunContext):
+        """Kad su podaci gotovi ili kandidat mora ići: predaj završetak (zahvala, end_call)."""
+        return (
+            KrajAgent(
+                stanje=self.stanje,
+                store=self.store,
+                kontekst=self.kontekst,
+                vrijeme=self.vrijeme,
+                chat_ctx=self.chat_ctx.copy(exclude_instructions=True),
+                tools=list(self.tools),
+            ),
+            "Predaj kraj razgovora.",
+        )
+
+
+class PozdravAgent(Agent):
+    """Faza 1: Halo, identitet, ima li minuta. Bez formular-alata."""
+
+    def __init__(
+        self,
+        *,
+        stanje: Stanje,
+        store: Store,
+        kontekst: Kontekst,
+        vrijeme: str,
+        tools: list | None = None,
+    ) -> None:
+        super().__init__(
+            instructions=prompts.voice_pozdrav(kontekst, vrijeme),
+            tools=tools or [],
+        )
+        self.stanje = stanje
+        self.store = store
+        self.kontekst = kontekst
+        self.vrijeme = vrijeme
+
+    @function_tool
+    async def zakazi_povratni_poziv(
+        self, context: RunContext, datum_vrijeme: str, napomena: str = ""
+    ) -> str:
+        dt = parse_termin(datum_vrijeme)
+        if dt is None:
+            return "Neispravan termin. Koristi YYYY-MM-DDTHH:MM."
+        if dt <= self.stanje.sada():
+            return "Termin je u prošlosti. Pitaj ponovo."
+        self.stanje.povratni_poziv = dt
+        self.stanje.povratni_poziv_napomena = (napomena or "").strip()
+        return f"Termin sačuvan: {opis(dt)}. Ponovi ga kandidatu."
+
+    @function_tool
+    async def zavrsi_razgovor(
+        self, context: RunContext, ishod: Ishod, sazetak: str
+    ) -> str:
+        self.stanje.ishod = ishod
+        self.stanje.sazetak = (sazetak or "").strip()
+        try:
+            await sacuvaj(self.store, self.stanje)
+        except Exception:
+            logger.exception(
+                "Speichern fehlgeschlagen für %s", self.stanje.kontekst.record_id
+            )
+            return "Spremanje nije uspjelo, ali se ljubazno oprosti od kandidata."
+        return "Sačuvano. Zahvali se, ljubazno se oprosti i pozovi end_call."
+
+    @function_tool
+    async def nastavi_prikupljanje(self, context: RunContext):
+        """Prava osoba ima par minuta: predaj prikupljanje podataka."""
+        return (
+            LinaAgent(
+                instructions=prompts.voice(self.kontekst, self.vrijeme),
+                stanje=self.stanje,
+                store=self.store,
+                kontekst=self.kontekst,
+                vrijeme=self.vrijeme,
+                chat_ctx=self.chat_ctx.copy(exclude_instructions=True),
+                tools=list(self.tools),
+            ),
+            "Nastavi prikupljanje.",
+        )
+
+
+class KrajAgent(Agent):
+    """Faza 3: zahvala, spremanje, end_call. Ne pita nova polja."""
+
+    def __init__(
+        self,
+        *,
+        stanje: Stanje,
+        store: Store,
+        kontekst: Kontekst,
+        vrijeme: str,
+        chat_ctx=None,
+        tools: list | None = None,
+    ) -> None:
+        kw = {}
+        if chat_ctx is not None:
+            kw["chat_ctx"] = chat_ctx
+        super().__init__(
+            instructions=prompts.voice_kraj(kontekst, vrijeme),
+            tools=tools or [],
+            **kw,
+        )
+        self.stanje = stanje
+        self.store = store
+
+    @function_tool
+    async def zavrsi_razgovor(
+        self, context: RunContext, ishod: Ishod, sazetak: str
+    ) -> str:
+        self.stanje.ishod = ishod
+        self.stanje.sazetak = (sazetak or "").strip()
+        try:
+            await sacuvaj(self.store, self.stanje)
+        except Exception:
+            logger.exception(
+                "Speichern fehlgeschlagen für %s", self.stanje.kontekst.record_id
+            )
+            return "Spremanje nije uspjelo. Oprosti se i pozovi end_call."
         return "Sačuvano. Zahvali se, ljubazno se oprosti i pozovi end_call."
