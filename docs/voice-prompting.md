@@ -13,12 +13,12 @@ Bei GPT-Live gibt es zwei Sets: Voice-Modell (wie gesprochen wird) und Backend-M
 - Tool-Ergebnisse zusammenfassen, keine IDs vorlesen
 
 ## 3. Natürlichkeit
-- Gesprochene Sprache modellieren: kurze Pausen, Spiegeln („Razumijem…“, „Odlično…“), Variation der Bestätigungen
+- Gesprochene Sprache: kurze Pausen, Inhalt spiegeln, Bestätigungen **variieren**. Floskeln („Razumijem“, „Odlično“) nicht in jedem Turn
 - Ruhiger, warmer Ton. Persönlichkeit als beobachtbares Verhalten beschreiben, nicht als Adjektivliste
 - Sprechmuster mehrfach im Prompt verankern, weil LLMs überwiegend auf geschriebenem Text trainiert sind
 
 ## 4. Architektur
-- Kontext klein halten, so wenige Handoffs wie möglich (bei GPT-Live kosten sie eine neue Session)
+- Drei Phasen: PozdravAgent → LinaAgent (Daten) → KrajAgent. GPT-Live: Handoff = neue Session, Gesprächsverlauf mit `chat_ctx.copy(exclude_instructions=True)` mitgeben
 - Das Modell interpretiert, der Code entscheidet. Airtable-Fetch und -Write passieren im Code bzw. in Tools
 - Kandidatenkontext nur als berechnete Zusammenfassung, nicht als Rohdaten
 
@@ -32,7 +32,7 @@ Pflichtszenarien für Lina:
 - Drei Berufsstationen nacheinander → alle drei werden erfasst, neueste zuerst
 - Überschneidung zweier Jobs → genau eine Rückfrage, danach übernommen
 - Rückruf „sutra poslije podne“ → absolutes Datum laut `Europe/Sarajevo` wird bestätigt und gespeichert
-- Bestätigung Schritt für Schritt → jede Station wird einzeln bestätigt. Nie mehr als eine Station pro Bestätigungsfrage
+- Bestätigung nur wenn unklar oder lang → eine Parafrase. Nicht nach jeder Station „je li tako?“
 - Kandidat korrigiert bei der Bestätigung eine Jahreszahl → der korrigierte Wert wird gespeichert
 - Kandidat nennt einen Wert außerhalb der Liste (z. B. Führerschein „kamion“) → Lina ordnet zu (C/CE) und bestätigt nach
 - Kandidat hat schon alle Angaben → Lina fragt nichts ab, bedankt sich und beendet das Gespräch

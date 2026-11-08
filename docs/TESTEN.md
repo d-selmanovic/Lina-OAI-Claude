@@ -36,8 +36,8 @@ lk agent debugger say "Da, imam vremena."
 lk agent debugger say "Radim kao zidar u firmi Hidrogradnja od dvije hiljade osamnaeste."
 lk agent debugger stop --chat-history
 ```
-Achte auf: bosnische Antworten, eine Frage pro Turn, Tool-Calls (`sacuvaj_podatak`,
-`dodaj_radno_mjesto`, `provjeri_podatke`). Nach Codeänderungen: `lk agent debugger restart`.
+Achte auf: bosnische Antworten, eine Frage pro Turn, zuerst `nastavi_prikupljanje`,
+dann `sacuvaj_podatak` / `dodaj_radno_mjesto`, am Ende `predji_na_kraj`. Nach Codeänderungen: `lk agent debugger restart`.
 
 **Achtung:** Endet das Gespräch mit `zavrsi_razgovor` oder bricht ab, schreibt Lina einen
 neuen Eintrag in `Dopune` (und ggf. `Radno iskustvo` / `Obrazovanje`) – verknüpft mit dem

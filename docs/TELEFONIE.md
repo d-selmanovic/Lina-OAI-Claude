@@ -1,6 +1,6 @@
 # Telefonie: LiveKit → FusionPBX → TG400 → SIM
 
-Stand 06.11.2026, erster erfolgreicher Testanruf. Keine Passwörter in dieser Datei.
+Stand 08.11.2026. Keine Passwörter in dieser Datei.
 
 ## Weg eines Anrufs
 ```text
@@ -36,16 +36,19 @@ Der Angerufene sieht die Nummer der SIM 1 (m:tel).
 - Firewall an, keine IP gesperrt. Nichts öffnen, was nicht nötig ist.
 
 ## Testanruf
-`testanruf.json` (nicht im Repo, steht in .gitignore):
-```json
-{"sip_trunk_id": "ST_pN6ccnMf26NY", "sip_call_to": "+387…", "room_name": "lina-test-…",
- "participant_identity": "kandidat", "wait_until_answered": true}
-```
+Lina wählt **nicht** selbst. Allowlist + CLI. Staging:
+
 ```bash
-lk sip participant create testanruf.json && \
-lk dispatch create --room <room_name> --agent-name livekit-oai-gig-casting \
-  --metadata '{"record_id":"rec17GODhyD0Lkgzp"}'
+lk sip participant create --project lina-oai --trunk ST_pN6ccnMf26NY \
+  --to +387… --agent-name livekit-oai-gig-casting --agent-deployment staging \
+  --agent-metadata '{"record_id":"rec…"}' --timeout 50s --wait -y
 ```
+
+Ohne `--agent-deployment staging` trifft **Production**.
+
+## AMD
+Nach dem Abheben (Staging): Mensch vs. Mailbox, `ivr_detection=False`.
+Voicemail: kurze Bosnisch-Nachricht, dann Ende.
 
 ## Fehlerbilder
 - 480 und `last_arg` mit Gateway `5c24281b…`: Anruf ging an sipgate (Route falsch).
@@ -54,6 +57,5 @@ lk dispatch create --room <room_name> --agent-name livekit-oai-gig-casting \
 
 ## Offen
 - Feste öffentliche IP des TG400-Standorts klären (Gateway nutzt 213.91.103.192).
-- Lina wählt noch nicht selbst: Anruf wird per `lk sip participant create` gestartet,
-  Lina kommt nach dem Abheben dazu (ca. 4–5 s Pause).
 - Eigene Nebenstelle für LiveKit statt 300 (Trennung von TG400).
+- Inbound (Kandidat ruft uns) nicht eingerichtet.

@@ -20,7 +20,7 @@ Zweistufiger Outbound-Prozess:
 - **Pre-Call-Fetch im Code, nicht im Modell:** Vor dem Gesprächsstart lädt der Entrypoint den Kandidaten-Datensatz aus Airtable und berechnet daraus `vorhanden` und `fehlt`. Nur diese Zusammenfassung geht an die Instruktionen, keine Rohdaten.
 - **Das Modell interpretiert, der Code entscheidet:** Zustand, Freigaben und Airtable-Schreibzugriffe liegen im Code bzw. in Tools.
 - **Zurückschreiben** nur über ein Tool, nur Felder mit Inhalt, und mit Gesprächsergebnis (erreicht, Rückruf, kein Interesse, Opt-out).
-- **So wenige Handoffs wie möglich.** Bei GPT-Live startet ein Handoff eine neue Session.
+- **Drei Gesprächsphasen (Handoff):** Pozdrav → Prikupljanje → Kraj. Tools nur in der Phase. GPT-Live startet pro Handoff eine neue Modell-Session; `chat_ctx` ohne alte Instruktionen mitgeben.
 - **Wissen** (Job-Step, Jobangebot) liegt in `docs/knowledge/` und wird von dort in die Instruktionen geladen, nicht im Code dupliziert.
 
 ## Datum und Zeit
@@ -31,7 +31,7 @@ Zweistufiger Outbound-Prozess:
 ## Datenerfassung
 - Berufserfahrung und Ausbildung sind **mehrfach**: Station für Station, neueste zuerst, bis keine weitere kommt.
 - **Plausibilität** prüft der Code (Tool `provjeri_podatke`), nicht das Modell. Regeln in `docs/plausibilitaet.md`. Pro Auffälligkeit genau einmal nachfragen.
-- **Bestätigung Schritt für Schritt, nicht als Block:** Lina bestätigt jede Station und jede wichtige Angabe **einzeln**, z. B. „Rekao si da si radio kao zidar u firmi X od 2018. do 2021. Je li tako?“, und erst dann kommt die nächste. Nie mehrere Stationen auf einmal vorlesen.
+- **Bestätigung nur bei Unsicherheit oder langem Eintrag**, eine kurze Parafrase, nicht nach jeder Station. Nie mehrere Stationen auf einmal vorlesen.
 - **Auswahl statt Freitext:** Schreib-Tools akzeptieren nur Werte aus `docs/feldwerte.md`.
 - **Airtable-Schutz:** Bestehende Felder und Daten werden nie umgebaut, überschrieben oder gelöscht. Neue Felder nur nach Freigabe.
 - Keine Sprach-Kontrollfragen auf Deutsch oder Englisch. Sprachniveau ist eine Selbsteinschätzung.
@@ -49,10 +49,10 @@ Zweistufiger Outbound-Prozess:
 - Keys nur in `.env.local` (gitignored). Nie in Code, Commits oder Chat.
 
 ## Code-Struktur
-- `src/agent.py`: Einstieg (Kandidat bestimmen → Pre-Call-Fetch → GPT-Live-Session → Speichern beim Ende)
+- `src/agent.py`: Einstieg, AMD (kein Simulation), Start mit PozdravAgent
 - `src/lina/config.py`: alle Airtable-IDs und der Fragenkatalog `PITANJA` (Reihenfolge, `abfragen=False` schaltet eine Frage ab)
 - `src/lina/kontekst.py`: „nur wenn leer“ inkl. Dopune · `plausibilitaet.py`: L1–L10 · `werte.py`: erlaubte Werte
-- `src/lina/agent_lina.py`: Tools · `prompts.py`: Instruktionen (Voice bosnisch, Backend englisch)
+- `src/lina/agent_lina.py`: PozdravAgent, LinaAgent, KrajAgent · `prompts.py`: Voice (drei Sets) + Backend
 - `src/lina/airtable.py`: Lesen und Schreiben · `simulacija.py`: Szenarien-Daten und Endzustands-Prüfung
 - `docs/knowledge/znanje-lina.md`: Wissen, das Lina sagen darf (bosnisch, wird in die Instruktionen geladen)
 

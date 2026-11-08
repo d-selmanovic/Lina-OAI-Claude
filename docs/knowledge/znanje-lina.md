@@ -1,6 +1,6 @@
 # Znanje za Linu (NACRT)
 
-> Status: NACRT iz Lina v2 (`prompts.py`). Opis posla se još prerađuje (vidi `job-angebot.md`).
+> Status: NACRT. Gehalt nur wenn der Kandidat fragt. Brutto-Zahlen unten; Netto nicht hier festlegen (DS).
 > Lina govori SAMO ono što piše ovdje, i samo ako kandidat pita.
 
 ## Job-Step
