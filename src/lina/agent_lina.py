@@ -5,6 +5,7 @@ hier wird nur verdrahtet. Tools ändern nur den Gesprächszustand – geschriebe
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Literal
 
@@ -21,6 +22,24 @@ from .stanje import Ishod, Stanje
 from .zeit import opis, parse_termin
 
 logger = logging.getLogger("lina.agent")
+
+
+def zakazi_prekid(context, sekunde: float = 14) -> None:
+    """Poslije zahvale prekini liniju, i ako model zaboravi end_call."""
+
+    async def _poklopi() -> None:
+        await asyncio.sleep(sekunde)
+        try:
+            context.session.shutdown(drain=True)
+        except TypeError:
+            context.session.shutdown()
+        except Exception:
+            logger.exception("prekid poziva")
+
+    try:
+        asyncio.get_running_loop().create_task(_poklopi())
+    except RuntimeError:
+        logger.exception("nema petlje za prekid")
 
 Polje = Literal[
     "status_boravka",
@@ -421,7 +440,8 @@ class LinaAgent(Agent):
                 "Speichern fehlgeschlagen für %s", self.stanje.kontekst.record_id
             )
             return "Spremanje nije uspjelo, ali se ljubazno oprosti od kandidata. Kolege će provjeriti."
-        return "Sačuvano. Zahvali se, ljubazno se oprosti i pozovi end_call."
+        zakazi_prekid(context)
+        return "Sačuvano. Zahvali se u jednoj rečenici i pozovi end_call. Poziv se prekida sam."
 
     @function_tool
     async def predji_na_kraj(self, context: RunContext):
@@ -489,7 +509,8 @@ class PozdravAgent(Agent):
                 "Speichern fehlgeschlagen für %s", self.stanje.kontekst.record_id
             )
             return "Spremanje nije uspjelo, ali se ljubazno oprosti od kandidata."
-        return "Sačuvano. Zahvali se, ljubazno se oprosti i pozovi end_call."
+        zakazi_prekid(context)
+        return "Sačuvano. Zahvali se u jednoj rečenici i pozovi end_call. Poziv se prekida sam."
 
     @function_tool
     async def nastavi_prikupljanje(self, context: RunContext):
@@ -545,4 +566,5 @@ class KrajAgent(Agent):
                 "Speichern fehlgeschlagen für %s", self.stanje.kontekst.record_id
             )
             return "Spremanje nije uspjelo. Oprosti se i pozovi end_call."
-        return "Sačuvano. Zahvali se, ljubazno se oprosti i pozovi end_call."
+        zakazi_prekid(context)
+        return "Sačuvano. Zahvali se u jednoj rečenici i pozovi end_call. Poziv se prekida sam."

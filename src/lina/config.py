@@ -141,7 +141,7 @@ PITANJA: tuple[Pitanje, ...] = (
     Pitanje("engleski", "znanje engleskog jezika"),
     Pitanje("vozacka", "vozačka dozvola (kategorije)", (P.VOZACKA,), D.VOZACKA),
     Pitanje("status_boravka", "status boravka", (P.STATUS_BORAVKA,), D.STATUS_BORAVKA, abfragen=False),
-    Pitanje("radna_dozvola", "radna dozvola", (P.RADNA_DOZVOLA,), D.RADNA_DOZVOLA),
+    Pitanje("radna_dozvola", "radna dozvola", (P.RADNA_DOZVOLA,), D.RADNA_DOZVOLA, abfragen=False),
     Pitanje("drzavljanstvo", "državljanstvo", (P.DRZAVLJANSTVO,), D.DRZAVLJANSTVO),
     Pitanje(
         "datum_rodjenja",

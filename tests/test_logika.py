@@ -50,9 +50,10 @@ def test_offene_dopune_zaehlt_als_vorhanden():
 
 
 def test_verworfene_dopune_zaehlt_nicht():
-    dop = [{D.STATUS_PREGLEDA: DOPUNE_ODBACENO, D.RADNA_DOZVOLA: "Nema"}]
+    dop = [{D.STATUS_PREGLEDA: DOPUNE_ODBACENO, D.DRZAVLJANSTVO: "BiH"}]
     k = izracunaj("rec1", {}, dop, [], [])
-    assert "radna_dozvola" in k.nedostaje
+    assert "drzavljanstvo" in k.nedostaje
+    assert "radna_dozvola" not in k.nedostaje
     assert "status_boravka" not in k.nedostaje
 
 

@@ -57,7 +57,7 @@ RUN uv run --module livekit.agents download-files
 # Copy all remaining application files into the container
 # This includes source code, configuration files, and dependency specifications
 # (Excludes files specified in .dockerignore)
-ARG CACHE_BUST=2026-11-09-zensko-pitanje
+ARG CACHE_BUST=2026-11-09-intro-opis
 COPY . .
 
 # --- Production stage ---
