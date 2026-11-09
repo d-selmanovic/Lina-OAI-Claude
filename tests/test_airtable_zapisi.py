@@ -92,6 +92,18 @@ def test_rueckruf_mit_zeitzone():
     assert t[TZ.STATUS] == "Todo"
 
 
+def test_prazan_poziv_ipak_ima_log():
+    from lina.config import PZ, T_POZIVI
+
+    k = izracunaj("recPRAZAN", {"fldFtCLmRLempwjls": "K-0001"}, [], [], [])
+    s = Stanje(k)
+    z = napravi_zapise(s)
+    assert z[T_POZIVI][0][PZ.ISHOD] == "prekinuto"
+    assert z[T_POZIVI][0][PZ.KANDIDAT] == ["recPRAZAN"]
+    assert z[T_DOPUNE] == []
+    assert T_PRIJAVE not in z or not z.get(T_PRIJAVE)
+
+
 def test_nur_einmal_speichern():
     store = FakeStore(Paket({}, [], [], []))
     s = _stanje()

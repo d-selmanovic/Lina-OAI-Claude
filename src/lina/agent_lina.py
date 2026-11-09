@@ -13,7 +13,9 @@ from livekit.agents import Agent, RunContext, function_tool
 from . import prompts, werte
 from .airtable import Store, sacuvaj
 from .datumi import parse_datum
+from .govor import obavezno_pitanje
 from .kontekst import Kontekst, Skola, Stanica
+from . import mapa
 from .plausibilitaet import provjeri
 from .stanje import Ishod, Stanje
 from .zeit import opis, parse_termin
@@ -51,6 +53,31 @@ Stepen = Literal[
 ]
 
 
+def _ubaci_obavezno(agent, turn_ctx, new_message) -> None:
+    tekst = getattr(new_message, "text_content", "") or ""
+    prethodno = ""
+    for item in reversed(list(getattr(turn_ctx, "items", []) or [])):
+        if getattr(item, "role", None) == "assistant":
+            prethodno = getattr(item, "text_content", "") or ""
+            break
+    q = obavezno_pitanje(
+        tekst,
+        prethodno,
+        agent.stanje.sve_stanice,
+        agent.stanje.kontekst.poznato_iskustvo,
+        agent.stanje.pitani_nalazi,
+    )
+    if not q:
+        return
+    turn_ctx.add_message(
+        role="developer",
+        content=(
+            "OBAVEZNO: sljedeća rečenica je samo ovo pitanje, pa čekaj. "
+            "Ne hvali i ne idi dalje. " + q
+        ),
+    )
+
+
 def _datum(v: str | None, *, kraj: bool):
     if v is None or not str(v).strip():
         return None, None
@@ -81,6 +108,34 @@ class LinaAgent(Agent):
         self.kontekst = kontekst if kontekst is not None else stanje.kontekst
         self.vrijeme = vrijeme
 
+    async def on_user_turn_completed(self, turn_ctx, new_message) -> None:
+        _ubaci_obavezno(self, turn_ctx, new_message)
+
+    def _logika_odmah(self) -> str:
+        """Nalazi koje glas mora odmah pitati. Svaki ključ samo jednom."""
+        st = self.stanje
+        dr = st.kontekst.datum_rodjenja
+        if "datum_rodjenja" in st.podaci:
+            dr = parse_datum(st.podaci["datum_rodjenja"], kraj=False) or dr
+        nalazi = provjeri(
+            st.sve_stanice, st.sve_skole, dr, st.dob_djece(), st.sada().date()
+        )
+        nove = [n for n in nalazi if n.kljuc not in st.pitani_nalazi]
+        st.pitani_nalazi.update(n.kljuc for n in nove)
+        if not nove:
+            return ""
+        return "\n".join(
+            f"PREKLAPANJE/LOGIKA [{n.kljuc}] {n.tekst} "
+            "PITAJ ODMAH, jedno pitanje, prije svega ostalog. Ne nastavljaj."
+            for n in nove
+        )
+
+    async def _mjesto_odmah(self, kljuc: str, pitanje: str, rezultat: bool | None) -> str:
+        if rezultat is not False or kljuc in self.stanje.pitani_nalazi:
+            return ""
+        self.stanje.pitani_nalazi.add(kljuc)
+        return f"PITAJ [{kljuc}] {pitanje} PITAJ ODMAH, jedno pitanje, bez optužbe. Prihvati odgovor."
+
     # ---------- einzelne Angaben ----------
 
     @function_tool
@@ -107,7 +162,14 @@ class LinaAgent(Agent):
         if greska:
             return f"Nije sačuvano: {greska} Pitaj kandidata kratko još jednom."
         self.stanje.podaci[polje] = w  # type: ignore[assignment]
-        return f"Sačuvano: {polje} = {w}."
+        extra = ""
+        if polje == "adresa" and w:
+            extra = await self._mjesto_odmah(
+                "MAPA:adresa",
+                "Samo da provjerim — ta ulica je u tom gradu?",
+                mapa.ulica_u_gradu(w),
+            )
+        return f"Sačuvano: {polje} = {w}." + (f"\n{extra}" if extra else "")
 
     # ---------- Berufserfahrung (mehrfach) ----------
 
@@ -124,7 +186,8 @@ class LinaAgent(Agent):
         drzava: str = "",
         opis: str = "",
     ) -> str:
-        """Fügt EINE Berufsstation hinzu (eine pro Aufruf), nachdem der Kandidat sie bestätigt hat.
+        """Fügt EINE Berufsstation hinzu, sobald Jahre genannt sind. Nicht auf eine zweite Bestätigung warten.
+        Der Rückgabewert kann PREKLAPANJE enthalten — das ist die nächste gesprochene Frage.
 
         Args:
             pozicija: Tätigkeit, z. B. 'Zidar'.
@@ -154,7 +217,8 @@ class LinaAgent(Agent):
             )
         )
         n = len(self.stanje.nove_stanice)
-        return f"Sačuvano kao radno mjesto broj {n}. Pozovi provjeri_podatke."
+        extra = self._logika_odmah()
+        return f"Sačuvano kao radno mjesto broj {n}." + (f"\n{extra}" if extra else "")
 
     @function_tool
     async def ispravi_radno_mjesto(
@@ -182,7 +246,8 @@ class LinaAgent(Agent):
         self.stanje.pitani_nalazi = {
             k for k in self.stanje.pitani_nalazi if f"r{redni_broj}" not in k
         }
-        return "Ispravljeno. Pozovi provjeri_podatke."
+        extra = self._logika_odmah()
+        return "Ispravljeno." + (f"\n{extra}" if extra else "")
 
     # ---------- Ausbildung (mehrfach) ----------
 
@@ -222,7 +287,18 @@ class LinaAgent(Agent):
                 izvor="lina",
             )
         )
-        return f"Sačuvano kao škola broj {len(self.stanje.nove_skole)}. Pozovi provjeri_podatke."
+        extra = self._logika_odmah()
+        mjesto = await self._mjesto_odmah(
+            f"MAPA:skola:{len(self.stanje.nove_skole)}",
+            "Samo da provjerim — ta škola je u tom gradu?",
+            mapa.skola_u_gradu(skola, adresa_skole),
+        )
+        dijelovi = [f"Sačuvano kao škola broj {len(self.stanje.nove_skole)}."]
+        if extra:
+            dijelovi.append(extra)
+        if mjesto:
+            dijelovi.append(mjesto)
+        return "\n".join(dijelovi)
 
     @function_tool
     async def ispravi_skolu(
@@ -248,9 +324,22 @@ class LinaAgent(Agent):
         else:
             setattr(s, polje, vrijednost.strip())
         self.stanje.pitani_nalazi = {
-            k for k in self.stanje.pitani_nalazi if f"s{redni_broj}" not in k
+            k for k in self.stanje.pitani_nalazi if f"s{redni_broj}" not in k and f"MAPA:skola:{redni_broj}" not in k
         }
-        return "Ispravljeno. Pozovi provjeri_podatke."
+        extra = self._logika_odmah()
+        mjesto = ""
+        if polje in ("skola", "adresa_skole"):
+            mjesto = await self._mjesto_odmah(
+                f"MAPA:skola:{redni_broj}",
+                "Samo da provjerim — ta škola je u tom gradu?",
+                mapa.skola_u_gradu(s.skola, s.adresa),
+            )
+        dijelovi = ["Ispravljeno."]
+        if extra:
+            dijelovi.append(extra)
+        if mjesto:
+            dijelovi.append(mjesto)
+        return "\n".join(dijelovi)
 
     # ---------- Plausibilität ----------
 
@@ -370,6 +459,9 @@ class PozdravAgent(Agent):
         self.store = store
         self.kontekst = kontekst
         self.vrijeme = vrijeme
+
+    async def on_user_turn_completed(self, turn_ctx, new_message) -> None:
+        _ubaci_obavezno(self, turn_ctx, new_message)
 
     @function_tool
     async def zakazi_povratni_poziv(

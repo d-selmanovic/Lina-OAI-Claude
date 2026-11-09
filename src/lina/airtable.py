@@ -21,9 +21,11 @@ from .config import (
     BASE_ID,
     DOPUNE_NOVO,
     OB,
+    PZ,
     RI,
     T_DOPUNE,
     T_OBRAZOVANJE,
+    T_POZIVI,
     T_PRIJAVE,
     T_RADNO_ISKUSTVO,
     T_TERMINI,
@@ -31,6 +33,7 @@ from .config import (
     D,
     P,
 )
+from . import r2
 from .stanje import Stanje
 
 logger = logging.getLogger("lina.airtable")
@@ -72,6 +75,22 @@ class Paket:
 class Store(Protocol):
     async def ucitaj(self, record_id: str) -> Paket: ...
     async def kreiraj(self, table: str, records: list[Fields]) -> list[str]: ...
+    async def azuriraj(self, table: str, record_id: str, fields: Fields) -> None: ...
+
+
+def _ima_podatke(stanje: Stanje) -> bool:
+    return bool(
+        stanje.podaci
+        or stanje.nove_stanice
+        or stanje.nove_skole
+        or stanje.napomene_provjere
+        or stanje.povratni_poziv
+    )
+
+
+def _okruzenje() -> str:
+    v = os.getenv("LIVEKIT_DEPLOYMENT") or os.getenv("LINA_OKRUZENJE") or "staging"
+    return v if v in ("staging", "production") else "staging"
 
 
 def napravi_zapise(stanje: Stanje) -> dict[str, list[Fields]]:
@@ -83,7 +102,27 @@ def napravi_zapise(stanje: Stanje) -> dict[str, list[Fields]]:
         T_RADNO_ISKUSTVO: [],
         T_OBRAZOVANJE: [],
         T_TERMINI: [],
+        T_POZIVI: [],
     }
+    kada = stanje.sada()
+    oznaka = f"{k.sifra or rid} {kada.strftime('%Y-%m-%d %H:%M')}"
+    sazetak = (stanje.sazetak or "").strip()
+    if not sazetak and stanje.transkript.strip():
+        sazetak = stanje.transkript.strip().replace("\n", " ")[:240]
+    if not sazetak:
+        sazetak = "Poziv prekinut, nema teksta."
+    poziv: Fields = {
+        PZ.OZNAKA: oznaka,
+        PZ.DATUM: kada.isoformat(timespec="seconds"),
+        PZ.SAZETAK: sazetak,
+        PZ.ISHOD: stanje.ishod or "prekinuto",
+        PZ.OKRUZENJE: _okruzenje(),
+        PZ.KANDIDAT: [rid],
+    }
+    zapisi[T_POZIVI].append(poziv)
+
+    if not _ima_podatke(stanje):
+        return zapisi
 
     notiz = [f"Lina (poziv 1) – ishod: {stanje.ishod or 'prekinuto'}"]
     if stanje.sazetak:
@@ -168,8 +207,14 @@ async def sacuvaj(store: Store, stanje: Stanje) -> dict[str, list[str]]:
     try:
         for table, records in napravi_zapise(stanje).items():
             if records and table not in stanje.zapisane_tabele:
-                rezultat[table] = await store.kreiraj(table, records)
+                ids = await store.kreiraj(table, records)
+                rezultat[table] = ids
                 stanje.zapisane_tabele.add(table)
+                if table == T_POZIVI and ids and stanje.transkript.strip():
+                    key = f"{_okruzenje()}/{stanje.kontekst.record_id}/{ids[0]}.txt"
+                    url = await r2.stavi(key, stanje.transkript)
+                    if url:
+                        await store.azuriraj(table, ids[0], {PZ.LINK: url})
         stanje.sacuvano = True
     finally:
         stanje.sprema_u_toku = False
@@ -253,6 +298,11 @@ class AirtableStore:
             ids.extend(r["id"] for r in data.get("records", []))
         return ids
 
+    async def azuriraj(self, table: str, record_id: str, fields: Fields) -> None:
+        await self._req(
+            "PATCH", self._url(table, record_id), json={"fields": fields}
+        )
+
 
 @dataclass
 class FakeStore:
@@ -270,6 +320,11 @@ class FakeStore:
             f"recFAKE{len(self.geschrieben[table]) - len(records) + i:010d}"
             for i in range(len(records))
         ]
+
+    async def azuriraj(self, table: str, record_id: str, fields: Fields) -> None:
+        self.geschrieben.setdefault("patch", []).append(
+            {"table": table, "id": record_id, "fields": fields}
+        )
 
 
 __all__ = ["AirtableStore", "FakeStore", "Paket", "Store", "napravi_zapise", "sacuvaj"]

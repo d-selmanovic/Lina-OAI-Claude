@@ -25,6 +25,14 @@ Fields = dict[str, Any]
 PLATZHALTER_LEER = {"", "-", "?", "–"}
 
 
+def _skola_ok(naziv: str) -> bool:
+    import unicodedata
+
+    s = unicodedata.normalize("NFKD", naziv or "")
+    s = "".join(c for c in s if not unicodedata.combining(c)).lower()
+    return any(w in s for w in ("skol", "gimnaz", "fakultet", "univerzitet", "akademij"))
+
+
 def prazno(v: Any) -> bool:
     if v is None:
         return True
@@ -114,6 +122,23 @@ class Kontekst:
                 "Već upisano školovanje (NE pitaj ponovo; samo jednom pitaj ima li još nešto):\n"
                 + "\n".join(f"- {s}" for s in self.poznato_obrazovanje)
             )
+        if self.datum_rodjenja:
+            from datetime import date
+
+            d = self.datum_rodjenja.datum
+            danas = date.today()
+            godine = danas.year - d.year - ((danas.month, danas.day) < (d.month, d.day))
+            if godine >= 60:
+                linije.append(
+                    "Godine: šezdeset ili više. Ne pitaj dalje. Reci da je posao težak fizički rad napolju i završi poziv."
+                )
+        sumnjive = [s.skola for s in self.skole if s.skola and not _skola_ok(s.skola)]
+        if sumnjive:
+            linije.append(
+                "Škola je upisana, ali naziv ne liči na školu ("
+                + ", ".join(sumnjive)
+                + "). Pitaj jednom, čim dođe školovanje: „Samo da provjerim — ta škola je u tom gradu?“"
+            )
         return "\n".join(linije)
 
 
@@ -151,6 +176,18 @@ def izracunaj(
     ]
 
     stanice = [_stanica_iz_ri(f) for f in radno_iskustvo]
+    od_flat = parse_datum(_tekst(kandidat.get(P.RI_OD)), kraj=False)
+    do_flat = parse_datum(_tekst(kandidat.get(P.RI_DO)), kraj=True)
+    if od_flat and do_flat and not prazno(kandidat.get(P.RADNO_MJESTO)):
+        stanice.append(
+            Stanica(
+                _tekst(kandidat.get(P.RADNO_MJESTO)),
+                _tekst(kandidat.get(P.KOMPANIJA)),
+                od_flat,
+                do_flat,
+                izvor="prijava",
+            )
+        )
     skole = [_skola_iz_ob(f) for f in obrazovanje]
 
     poznato_iskustvo = [s.kratko() for s in stanice]

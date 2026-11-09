@@ -50,9 +50,10 @@ def test_offene_dopune_zaehlt_als_vorhanden():
 
 
 def test_verworfene_dopune_zaehlt_nicht():
-    dop = [{D.STATUS_PREGLEDA: DOPUNE_ODBACENO, D.STATUS_BORAVKA: "BiH"}]
+    dop = [{D.STATUS_PREGLEDA: DOPUNE_ODBACENO, D.RADNA_DOZVOLA: "Nema"}]
     k = izracunaj("rec1", {}, dop, [], [])
-    assert "status_boravka" in k.nedostaje
+    assert "radna_dozvola" in k.nedostaje
+    assert "status_boravka" not in k.nedostaje
 
 
 def test_erfahrung_vorhanden_wird_nicht_erneut_gefragt():

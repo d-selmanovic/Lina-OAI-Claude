@@ -33,6 +33,7 @@ class Stanje:
     povratni_poziv_napomena: str = ""
     ishod: Ishod | None = None
     sazetak: str = ""
+    transkript: str = ""
     sacuvano: bool = False
     zapisane_tabele: set[str] = field(
         default_factory=set

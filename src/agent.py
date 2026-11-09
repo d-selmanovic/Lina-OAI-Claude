@@ -69,6 +69,29 @@ async def on_simulation_end(sim: SimulationContext) -> None:
         sim.fail(reason="; ".join(fehler))
 
 
+def _tekst_iz_historije(history) -> str:
+    items = getattr(history, "items", None)
+    if items is None and isinstance(history, list):
+        items = history
+    linije = []
+    for item in items or []:
+        role = getattr(item, "role", None)
+        if role not in ("user", "assistant"):
+            continue
+        tekst = getattr(item, "text_content", None)
+        if not tekst:
+            sadrzaj = getattr(item, "content", "")
+            if isinstance(sadrzaj, list):
+                tekst = " ".join(str(c) for c in sadrzaj if isinstance(c, str))
+            else:
+                tekst = str(sadrzaj or "")
+        tekst = (tekst or "").strip()
+        if not tekst:
+            continue
+        linije.append(("Kandidat: " if role == "user" else "Lina: ") + tekst)
+    return "\n".join(linije)
+
+
 server = AgentServer()
 
 
@@ -136,15 +159,9 @@ async def my_agent(ctx: JobContext):
     async def spremi_na_kraju() -> None:
         if stanje.sacuvano:
             return
-        if stanje.ishod is None and not (
-            stanje.podaci
-            or stanje.nove_stanice
-            or stanje.nove_skole
-            or stanje.povratni_poziv
-        ):
-            # Nichts erfasst und kein Ergebnis: keinen leeren Dopune-Eintrag erzeugen.
-            logger.info("Gespräch ohne erfasste Angaben beendet – nichts gespeichert")
-            return
+        stanje.transkript = _tekst_iz_historije(session.history)
+        if not stanje.sazetak and stanje.transkript:
+            stanje.sazetak = stanje.transkript.replace("\n", " ")[:240]
         stanje.ishod = stanje.ishod or "prekinuto"
         try:
             await sacuvaj(store, stanje)

@@ -27,11 +27,10 @@ def test_ablauf_mit_ueberschneidung_und_speichern():
     assert "Sačuvano" in run(a.sacuvaj_podatak(None, "vozacka", "b, ce"))
     assert "Nije sačuvano" in run(a.sacuvaj_podatak(None, "vozacka", "kamion"))
     run(a.dodaj_radno_mjesto(None, "Zidar", "A", "2010", "2015"))
-    run(a.dodaj_radno_mjesto(None, "Zidar", "B", "2013", "2017", grad=None))
+    r_job = run(a.dodaj_radno_mjesto(None, "Zidar", "B", "2013", "2017", grad=None))
+    assert "PREKLAPANJE" in r_job and "L1:r1-r2" in r_job
     r1 = run(a.provjeri_podatke(None))
-    assert "L1:r1-r2" in r1
-    r2 = run(a.provjeri_podatke(None))
-    assert "logično" in r2  # dieselbe Auffälligkeit nicht nochmal
+    assert "logično" in r1  # već prijavljeno pri snimanju, ne ponovo
     run(a.zabiljezi_objasnjenje(None, "L1:r1-r2", "paralelno, vikendom"))
     assert "Sačuvano" in run(a.zavrsi_razgovor(None, "zavrseno", "Sve prikupljeno."))
     assert len(store.geschrieben[T_RADNO_ISKUSTVO]) == 2
@@ -40,8 +39,8 @@ def test_ablauf_mit_ueberschneidung_und_speichern():
 
 def test_korrektur_erlaubt_neue_rueckfrage():
     a, _st, _ = _agent()
-    run(a.dodaj_radno_mjesto(None, "Zidar", "A", "2018", "2015"))
-    assert "L2" in run(a.provjeri_podatke(None))
+    r_lose = run(a.dodaj_radno_mjesto(None, "Zidar", "A", "2018", "2015"))
+    assert "L2" in r_lose
     run(a.ispravi_radno_mjesto(None, 1, "do", "2021"))
     assert "logično" in run(a.provjeri_podatke(None))
 
@@ -95,3 +94,32 @@ def test_langfuse_mit_keys_ohne_inhalte(monkeypatch):
     monkeypatch.setattr(t, "set_tracer_provider", lambda p, **kw: gesehen.update(kw))
     assert telemetrie.setup_langfuse({"x": "y"}) is not None
     assert gesehen["allow_pii"] is False
+
+
+def test_godisnja_granica_nije_preklapanje():
+    a, _, _ = _agent()
+    run(a.dodaj_radno_mjesto(None, "Zidar", "A", "2010", "2015"))
+    r = run(a.dodaj_radno_mjesto(None, "Vozač", "B", "2015", "2018"))
+    assert "PREKLAPANJE" not in r
+
+
+def test_lazna_ulica_i_skola_pitaju_odmah(monkeypatch):
+    import lina.mapa as mapa
+
+    monkeypatch.setattr(mapa, "ulica_u_gradu", lambda _a: False)
+    monkeypatch.setattr(mapa, "skola_u_gradu", lambda *_a, **_k: False)
+    a, _, _ = _agent()
+    r_adr = run(a.sacuvaj_podatak(None, "adresa", "Ulica Izmišljena 9, Bihać"))
+    assert "PITAJ" in r_adr and "ulica" in r_adr
+    r_sk = run(a.dodaj_skolu(None, "Škola Qwertyxyz", "Bihać", "2005", "2009"))
+    assert "PITAJ" in r_sk and "škola" in r_sk
+
+
+def test_poznata_ulica_ne_pita(monkeypatch):
+    import lina.mapa as mapa
+
+    monkeypatch.setattr(mapa, "ulica_u_gradu", lambda _a: True)
+    a, _, _ = _agent()
+    r = run(a.sacuvaj_podatak(None, "adresa", "Bosanska, Bihać"))
+    assert "PITAJ" not in r
+

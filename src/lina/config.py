@@ -17,6 +17,7 @@ T_DOPUNE = "tblzvtVFXZHFgk8mq"
 T_RADNO_ISKUSTVO = "tblbRG7v8pTRqVTqH"
 T_OBRAZOVANJE = "tblyAQ6ud95RW76Ym"
 T_TERMINI = "tblMTxAh92crqggAY"
+T_POZIVI = "tblXnTENm7kts7wwT"
 
 
 class P:
@@ -43,6 +44,8 @@ class P:
     # Flache Altfelder (Excel-Import) – nur als „schon bekannt“ gelesen
     RADNO_MJESTO = "fld1qJ6uYZ7HKsXuU"
     KOMPANIJA = "fldeiamQZD6JaQE2r"
+    RI_OD = "fld89KIp3njkrB6aT"
+    RI_DO = "fldJMsJXNZgMJ3q0f"
     SKOLA_TXT = "fldczOviQFhemuJ9u"
     STRUKA_TXT = "fldV8JGvCxQ1cHHku"
     # Verknüpfungen
@@ -137,7 +140,7 @@ PITANJA: tuple[Pitanje, ...] = (
     Pitanje("njemacki", "znanje njemačkog jezika", (P.NJEMACKI_TXT,)),
     Pitanje("engleski", "znanje engleskog jezika"),
     Pitanje("vozacka", "vozačka dozvola (kategorije)", (P.VOZACKA,), D.VOZACKA),
-    Pitanje("status_boravka", "status boravka", (P.STATUS_BORAVKA,), D.STATUS_BORAVKA),
+    Pitanje("status_boravka", "status boravka", (P.STATUS_BORAVKA,), D.STATUS_BORAVKA, abfragen=False),
     Pitanje("radna_dozvola", "radna dozvola", (P.RADNA_DOZVOLA,), D.RADNA_DOZVOLA),
     Pitanje("drzavljanstvo", "državljanstvo", (P.DRZAVLJANSTVO,), D.DRZAVLJANSTVO),
     Pitanje(
@@ -157,3 +160,15 @@ PITANJA: tuple[Pitanje, ...] = (
 )
 
 PITANJA_PO_KLJUCU = {p.key: p for p in PITANJA}
+
+
+class PZ:
+    """Felder in `Pozivi Lina`. IDs aus einem echten Datensatz gelesen."""
+
+    OZNAKA = "fldPhgstZr2w0jWh0"
+    DATUM = "fldnTzrg7Hr0JXbXX"
+    SAZETAK = "fld2zR95HuXrH9n3U"
+    ISHOD = "fld2x5xef6sTSqKxN"
+    OKRUZENJE = "fldXBshsogj5bAmyg"
+    KANDIDAT = "fldDpduprNvEcngxr"
+    LINK = "fld1cRL36FOnMHXRT"
