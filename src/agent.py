@@ -196,7 +196,13 @@ async def my_agent(ctx: JobContext):
     if ctx.simulation_context():
         return
     try:
-        async with AMD(session, ivr_detection=False) as detector:
+        # Default-STT von AMD (cartesia/ink-whisper) gibt es in der EU-Region nicht;
+        # ohne Transkript endet AMD immer mit UNCERTAIN. Nova-3 hat EU-Endpunkt und Bosnisch.
+        async with AMD(
+            session,
+            stt=os.getenv("LINA_AMD_STT", "deepgram/nova-3:bs"),
+            ivr_detection=False,
+        ) as detector:
             amd = await detector.execute()
         logger.info("AMD category=%s", amd.category)
         if amd.category == "machine-vm":
