@@ -108,3 +108,17 @@ def test_jezici_odvojeno():
     from lina import prompts
 
     assert "Nikad „njemačkog ili engleskog“ u istom pitanju" in prompts.VOICE
+
+
+def test_oprostaj_tek_poslije_kraja():
+    from lina import prompts
+
+    assert "Nikad se ne opraštaj" in prompts._ZAJEDNICKO
+    assert "Veza je loša" in prompts._DEL_PODACI
+
+
+def test_ponuda_jedno_pitanje():
+    from lina import prompts
+
+    assert "Pitaj koja ga zanima i gdje ima iskustva" not in prompts.VOICE
+    assert "Pitaj samo koja ga zanima. Čekaj odgovor." in prompts.VOICE

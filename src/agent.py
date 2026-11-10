@@ -163,7 +163,7 @@ async def my_agent(ctx: JobContext):
         stanje.transkript = _tekst_iz_historije(session.history)
         if not stanje.sazetak and stanje.transkript:
             stanje.sazetak = stanje.transkript.replace("\n", " ")[:240]
-        stanje.ishod = stanje.ishod or "prekinuto"
+        stanje.ishod = stanje.ishod or stanje.ishod_bez_kraja()
         try:
             await sacuvaj(store, stanje)
         except Exception:

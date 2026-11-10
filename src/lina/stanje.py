@@ -58,6 +58,18 @@ class Stanje:
     def sve_skole(self) -> list[Skola]:
         return [*self.kontekst.skole, *self.nove_skole]
 
+    def ishod_bez_kraja(self) -> Ishod:
+        """Ishod, wenn das Gespräch ohne zavrsi_razgovor endet (Leitung weg, Auflegen).
+
+        Ein Rückruftermin oder schon gespeicherte Angaben sind kein Abbruch:
+        sonst ruft der Dispatcher den Kandidaten erneut an und fragt alles noch einmal.
+        """
+        if self.povratni_poziv is not None:
+            return "povratni_poziv"
+        if self.podaci or self.nove_stanice or self.nove_skole:
+            return "djelimicno"
+        return "prekinuto"
+
     def dob_djece(self) -> list[int]:
         return [
             int(x)
