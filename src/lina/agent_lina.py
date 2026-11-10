@@ -11,12 +11,11 @@ from typing import Literal
 
 from livekit.agents import Agent, RunContext, function_tool
 
-from . import prompts, werte
+from . import mapa, prompts, werte
 from .airtable import Store, sacuvaj
 from .datumi import parse_datum
 from .govor import obavezno_pitanje
 from .kontekst import Kontekst, Skola, Stanica
-from . import mapa
 from .plausibilitaet import provjeri
 from .stanje import Ishod, Stanje
 from .zeit import opis, parse_termin
@@ -40,6 +39,19 @@ def zakazi_prekid(context, sekunde: float = 14) -> None:
         asyncio.get_running_loop().create_task(_poklopi())
     except RuntimeError:
         logger.exception("nema petlje za prekid")
+
+
+def _cinjenice(
+    stanje: Stanje,
+    zainteresiran: str,
+    negativan_komentar: str,
+    iskustvo_u_poslu: str,
+) -> None:
+    from .status_odluka import normalizuj
+
+    stanje.zainteresiran = normalizuj(zainteresiran)
+    stanje.negativan_komentar = normalizuj(negativan_komentar)
+    stanje.iskustvo_u_poslu = normalizuj(iskustvo_u_poslu)
 
 Polje = Literal[
     "status_boravka",
@@ -423,16 +435,28 @@ class LinaAgent(Agent):
 
     @function_tool
     async def zavrsi_razgovor(
-        self, context: RunContext, ishod: Ishod, sazetak: str
+        self,
+        context: RunContext,
+        ishod: Ishod,
+        sazetak: str,
+        zainteresiran: str = "nepoznato",
+        negativan_komentar: str = "nepoznato",
+        iskustvo_u_poslu: str = "nepoznato",
     ) -> str:
         """Beendet die Datenerfassung und speichert alles in Airtable. Danach end_call aufrufen.
+
+        Den Status-Namen nicht wählen und nicht aussprechen. Nur die drei Fakten melden.
 
         Args:
             ishod: Ergebnis des Gesprächs.
             sazetak: Ein Satz Zusammenfassung auf Bosnisch.
+            zainteresiran: da, ne oder nepoznato. Nur was der Kandidat gesagt hat.
+            negativan_komentar: da nur bei einem klaren negativen Kommentar, sonst ne oder nepoznato.
+            iskustvo_u_poslu: da, ne oder nepoznato für die Position aus diesem Gespräch. Nicht raten.
         """
         self.stanje.ishod = ishod
         self.stanje.sazetak = (sazetak or "").strip()
+        _cinjenice(self.stanje, zainteresiran, negativan_komentar, iskustvo_u_poslu)
         try:
             await sacuvaj(self.store, self.stanje)
         except Exception:
@@ -498,10 +522,17 @@ class PozdravAgent(Agent):
 
     @function_tool
     async def zavrsi_razgovor(
-        self, context: RunContext, ishod: Ishod, sazetak: str
+        self,
+        context: RunContext,
+        ishod: Ishod,
+        sazetak: str,
+        zainteresiran: str = "nepoznato",
+        negativan_komentar: str = "nepoznato",
+        iskustvo_u_poslu: str = "nepoznato",
     ) -> str:
         self.stanje.ishod = ishod
         self.stanje.sazetak = (sazetak or "").strip()
+        _cinjenice(self.stanje, zainteresiran, negativan_komentar, iskustvo_u_poslu)
         try:
             await sacuvaj(self.store, self.stanje)
         except Exception:
@@ -555,10 +586,17 @@ class KrajAgent(Agent):
 
     @function_tool
     async def zavrsi_razgovor(
-        self, context: RunContext, ishod: Ishod, sazetak: str
+        self,
+        context: RunContext,
+        ishod: Ishod,
+        sazetak: str,
+        zainteresiran: str = "nepoznato",
+        negativan_komentar: str = "nepoznato",
+        iskustvo_u_poslu: str = "nepoznato",
     ) -> str:
         self.stanje.ishod = ishod
         self.stanje.sazetak = (sazetak or "").strip()
+        _cinjenice(self.stanje, zainteresiran, negativan_komentar, iskustvo_u_poslu)
         try:
             await sacuvaj(self.store, self.stanje)
         except Exception:

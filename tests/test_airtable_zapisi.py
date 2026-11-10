@@ -110,3 +110,23 @@ def test_nur_einmal_speichern():
     asyncio.run(sacuvaj(store, s))
     asyncio.run(sacuvaj(store, s))
     assert len(store.geschrieben[T_DOPUNE]) == 1
+
+
+def test_status_einmal_am_ende_nicht_in_prijave_zeile():
+    from lina.config import P
+
+    store = FakeStore(Paket({}, [], [], []))
+    s = _stanje()
+    s.ishod = "zavrseno"
+    s.zainteresiran = "da"
+    s.negativan_komentar = "ne"
+    s.iskustvo_u_poslu = "da"
+    s.polja = {}
+    asyncio.run(sacuvaj(store, s))
+    patches = [p for p in store.geschrieben.get("patch", []) if p["table"] == T_PRIJAVE]
+    assert patches == [
+        {"table": T_PRIJAVE, "id": "recTEST", "fields": {P.STATUS_KANDIDATA: "Zainteresiran"}}
+    ]
+    assert T_PRIJAVE not in {t for t, r in napravi_zapise(s).items() if r}
+    asyncio.run(sacuvaj(store, s))
+    assert len([p for p in store.geschrieben["patch"] if p["table"] == T_PRIJAVE]) == 1

@@ -137,6 +137,7 @@ async def my_agent(ctx: JobContext):
         record_id, paket.kandidat, paket.dopune, paket.radno_iskustvo, paket.obrazovanje
     )
     stanje = Stanje(kontekst, fiksno_vrijeme=fiksno)
+    stanje.polja = dict(paket.kandidat)
     vrijeme = opis(stanje.sada())
     logger.info("Kontekst: %d Angaben fehlen", len(kontekst.nedostaje))
 

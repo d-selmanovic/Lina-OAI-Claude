@@ -1,9 +1,10 @@
 """Airtable-Zugriff: Pre-Call-Fetch und Zurückschreiben.
 
 Regeln (.claude/rules/airtable.md):
-- Lina schreibt NIE in `Prijave (test)`. Personendaten → neue `Dopune` (Status „Novo“),
+- Lina schreibt Personendaten nie als neue Zeile in `Prijave (test)`. Einmal, am Ende,
+  darf sie nur `Status kandidata` setzen. Personendaten → neue `Dopune` (Status „Novo“),
   Stationen → neue Datensätze in `Radno iskustvo` / `Obrazovanje`, Rückruf → `Termini i zadaci`.
-- Es werden nur neue Datensätze angelegt. Nichts wird überschrieben oder gelöscht.
+- Es werden nur neue Datensätze angelegt. Der einzige Patch ist `Status kandidata`, einmal.
 - Keine Personendaten in Logs, nur Record-IDs.
 """
 
@@ -17,6 +18,7 @@ from typing import Any, Protocol
 
 import aiohttp
 
+from . import r2
 from .config import (
     BASE_ID,
     DOPUNE_NOVO,
@@ -33,8 +35,8 @@ from .config import (
     D,
     P,
 )
-from . import r2
 from .stanje import Stanje
+from .status_odluka import dokumenti, licni_popunjeni, odluka, trenutni_status
 
 logger = logging.getLogger("lina.airtable")
 
@@ -197,6 +199,33 @@ def napravi_zapise(stanje: Stanje) -> dict[str, list[Fields]]:
     return zapisi
 
 
+async def _status_einmal(store: Store, stanje: Stanje) -> None:
+    if "status" in stanje.zapisane_tabele:
+        return
+    diploma, pasos, foto = dokumenti(stanje.polja)
+    javio_se = stanje.ishod not in (None, "prekinuto") or "Kandidat:" in (
+        stanje.transkript or ""
+    )
+    novi = odluka(
+        javio_se=javio_se,
+        zainteresiran=stanje.zainteresiran,
+        negativan_komentar=stanje.negativan_komentar,
+        iskustvo_u_poslu=stanje.iskustvo_u_poslu,
+        licni_popunjeni=licni_popunjeni(stanje.polja, stanje.podaci),
+        diploma=diploma,
+        pasos=pasos,
+        foto=foto,
+        trenutni_status=trenutni_status(stanje.polja),
+    )
+    if novi:
+        await store.azuriraj(
+            T_PRIJAVE,
+            stanje.kontekst.record_id,
+            {P.STATUS_KANDIDATA: novi},
+        )
+    stanje.zapisane_tabele.add("status")
+
+
 async def sacuvaj(store: Store, stanje: Stanje) -> dict[str, list[str]]:
     """Schreibt jede Tabelle genau einmal. Schlägt eine fehl, kann ein späterer Aufruf
     (z. B. beim Sitzungsende) nur die fehlenden Tabellen nachholen – ohne Duplikate."""
@@ -215,6 +244,7 @@ async def sacuvaj(store: Store, stanje: Stanje) -> dict[str, list[str]]:
                     url = await r2.stavi(key, stanje.transkript)
                     if url:
                         await store.azuriraj(table, ids[0], {PZ.LINK: url})
+        await _status_einmal(store, stanje)
         stanje.sacuvano = True
     finally:
         stanje.sprema_u_toku = False

@@ -34,6 +34,10 @@ class Stanje:
     ishod: Ishod | None = None
     sazetak: str = ""
     transkript: str = ""
+    polja: dict = field(default_factory=dict)
+    zainteresiran: str = "nepoznato"
+    negativan_komentar: str = "nepoznato"
+    iskustvo_u_poslu: str = "nepoznato"
     sacuvano: bool = False
     zapisane_tabele: set[str] = field(
         default_factory=set
