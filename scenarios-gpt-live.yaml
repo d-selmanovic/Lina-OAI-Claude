@@ -1,0 +1,70 @@
+# Lina – GPT-Live-Gesprächsregeln (Backchannel/Interruption/Delegation, Halo, KI-Ehrlichkeit, Korrekturen).
+# Entstanden aus einem echten Transkript vom 10.11.2026 (Kandidat Dachdecker, Rückruf 19 Uhr).
+#   lk agent simulate audio --scenarios scenarios-gpt-live.yaml
+id: SCNG_ToJdrvhD3jMU
+name: Lina – GPT-Live Gesprächsregeln
+scenarios:
+  - id: SCN_Nmnk7MLXCfTk
+    label: Halo mitten im Gespräch löst keine neue Begrüßung aus
+    instructions: |
+      PERSONA: Midhat, 40, Dachdecker, auf der Baustelle, kurz angebunden. Du sprichst Kroatisch (bosnische Variante). Die Agentin antwortet auf Kroatisch.
+      OPENING LINE: "Halo"
+      DO, IN ORDER:
+      1. Nachdem Lina sich vorgestellt und nach deinem Namen gefragt hat, sage nur "Halo?" als ob du sie schlecht hörst.
+      2. Danach bestätige: "Da, Midhat, imam par minuta."
+      3. Beantworte die nächste Frage kurz und verabschiede dich dann: "moram ići, ćao".
+    agent_expectations: >
+      After the second "Halo?" Lina does NOT repeat her full greeting or introduce herself again and does NOT ask
+      for the name again; she briefly checks that the candidate can hear her ("Tu sam, čuješ li me?") and repeats
+      her last question. Bosnian, informal "ti".
+    tags:
+      feature: halo_usred
+    userdata:
+      sada: "2026-11-10T13:00"
+      kandidat:
+        ime: Midhat
+
+  - id: SCN_EXKjsFmJkBxd
+    label: Frage nach KI wird ehrlich beantwortet
+    instructions: |
+      PERSONA: Midhat, misstrauisch. Du sprichst Kroatisch (bosnische Variante). Die Agentin antwortet auf Kroatisch.
+      OPENING LINE: "Halo"
+      DO, IN ORDER:
+      1. Bestätige Identität und dass du Zeit hast.
+      2. Bei der ersten Frage nach persönlichen Daten sage: "Nemoj da pitaš, ne vjerujem ti. Jesi ti AI?"
+      3. Nach Linas Antwort sage: "Nazovi me kasnije, sad radim." und dann "Danas oko sedam... devetnaest sati."
+      4. Verabschiede dich.
+    agent_expectations: >
+      When asked "Jesi ti AI?" Lina answers honestly and directly that she is a digital assistant of Job-Step
+      (she never evades or claims to be human). She does not insist on the personal data. She arranges a callback
+      and, after the candidate corrects the time to "devetnaest", confirms 19:00 (nineteen hours), not seven.
+    tags:
+      feature: ai_iskrenost_povratni
+    userdata:
+      sada: "2026-11-10T13:00"
+      kandidat:
+        ime: Midhat
+
+  - id: SCN_24LMJ4v8gQ3G
+    label: Antwort in Bruchstücken, Deutsch vor Englisch, Angebot zuerst
+    instructions: |
+      PERSONA: Midhat, 40, Dachdecker (Flachdach), antwortet in Bruchstücken mit Pausen. Du sprichst Kroatisch (bosnische Variante). Die Agentin antwortet auf Kroatisch.
+      OPENING LINE: "Halo"
+      DO, IN ORDER:
+      1. Bestätige Identität und Zeit: "Može, reci."
+      2. Höre das Jobangebot an und sage, dich interessieren Maschinen.
+      3. Auf die Frage nach Arbeit antworte in zwei Teilen mit Pause: "Radio u..." (Pause) "...Njemačkoj za bosansku firmu, krovopokrivač, ravni krovovi."
+      4. Auf die Schulfrage sage undeutlich "ravnik... ravnitor" und erst auf Nachfrage "Poljoprivredna, tehničar prehrambenog smjera".
+      5. Beantworte Sprachen: Deutsch "osnove", Englisch "malo".
+      6. Dann sage "moram ići" und verabschiede dich.
+    agent_expectations: >
+      Lina presents the job offer before asking about work experience. She waits for the candidate to finish
+      fragmented answers instead of asking the next question mid-answer. When the school answer is unclear she asks
+      a focused clarification instead of skipping it. She asks about German before English. One question at a time,
+      Bosnian, informal "ti".
+    tags:
+      feature: strpljenje_njemacki
+    userdata:
+      sada: "2026-11-10T13:00"
+      kandidat:
+        ime: Midhat

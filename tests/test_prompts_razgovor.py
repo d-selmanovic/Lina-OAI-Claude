@@ -53,3 +53,58 @@ def test_voice_ablauf_skakanje_smalltalk():
     assert "Ne poslije svakog posla" in VOICE
     assert "bez SSML" in VOICE
     assert "predji_na_kraj" in VOICE
+
+
+def _sve_voice():
+    from lina import prompts
+
+    return (
+        prompts.VOICE,
+        prompts.VOICE_POZDRAV,
+        prompts.VOICE_KRAJ,
+    )
+
+
+def test_gpt_live_politike_u_svakom_voice_promptu():
+    for tpl in _sve_voice():
+        assert "{zajednicko}" in tpl
+        assert "{delegacija}" in tpl
+    from lina.prompts import _DEL_KRAJ, _DEL_PODACI, _DEL_POZDRAV, _ZAJEDNICKO
+
+    for naslov in ("Backchannel policy:", "Interruption policy:"):
+        assert naslov in _ZAJEDNICKO
+    for d in (_DEL_POZDRAV, _DEL_PODACI, _DEL_KRAJ):
+        assert "Delegation policy:" in d
+        assert "Backend tools:" in d
+        assert "Generate <|SpawnThinking|> when:" in d
+        assert "Do not generate <|SpawnThinking|> when:" in d
+
+
+def test_halo_ispravke_iskrenost():
+    from lina.prompts import _ZAJEDNICKO
+
+    assert "Nikad ne ponavljaj pozdrav" in _ZAJEDNICKO
+    assert "ponovi NOVU vrijednost" in _ZAJEDNICKO
+    assert "ja sam Lina, digitalna asistentica" in _ZAJEDNICKO
+    assert "nikad ne reci da si čovjek" in _ZAJEDNICKO
+    assert "Ne pogađaj" in _ZAJEDNICKO
+
+
+def test_njemacki_prvi_i_ponuda_prije_iskustva():
+    assert "PRVO njemački" in VOICE
+    assert "Ponuda (tačka 1–3) ide UVIJEK prije pitanja o radnom iskustvu" in VOICE
+
+
+def test_pozdrav_bez_iskustva_i_kratko_ponavljanje():
+    from lina import prompts
+
+    t = prompts.VOICE_POZDRAV
+    assert "Nikad u pozdravu ne pitaj za iskustvo" in t
+    assert "odmah nastavi_prikupljanje" in t
+    assert "ne ponavljaj cijeli pozdrav" in t
+
+
+def test_jezici_odvojeno():
+    from lina import prompts
+
+    assert "Nikad „njemačkog ili engleskog“ u istom pitanju" in prompts.VOICE

@@ -53,6 +53,7 @@ def _cinjenice(
     stanje.negativan_komentar = normalizuj(negativan_komentar)
     stanje.iskustvo_u_poslu = normalizuj(iskustvo_u_poslu)
 
+
 Polje = Literal[
     "status_boravka",
     "radna_dozvola",
@@ -136,6 +137,9 @@ class LinaAgent(Agent):
         super().__init__(instructions=instructions, tools=tools or [], **kw)
         self.stanje = stanje
         self.store = store
+        # Nur von außen übergebene Tools (z. B. end_call) weitergeben, nie die
+        # eigenen @function_tool-Methoden: sonst doppelte Namen beim Handoff.
+        self.extra_tools = list(tools or [])
         self.kontekst = kontekst if kontekst is not None else stanje.kontekst
         self.vrijeme = vrijeme
 
@@ -161,7 +165,9 @@ class LinaAgent(Agent):
             for n in nove
         )
 
-    async def _mjesto_odmah(self, kljuc: str, pitanje: str, rezultat: bool | None) -> str:
+    async def _mjesto_odmah(
+        self, kljuc: str, pitanje: str, rezultat: bool | None
+    ) -> str:
         if rezultat is not False or kljuc in self.stanje.pitani_nalazi:
             return ""
         self.stanje.pitani_nalazi.add(kljuc)
@@ -355,7 +361,9 @@ class LinaAgent(Agent):
         else:
             setattr(s, polje, vrijednost.strip())
         self.stanje.pitani_nalazi = {
-            k for k in self.stanje.pitani_nalazi if f"s{redni_broj}" not in k and f"MAPA:skola:{redni_broj}" not in k
+            k
+            for k in self.stanje.pitani_nalazi
+            if f"s{redni_broj}" not in k and f"MAPA:skola:{redni_broj}" not in k
         }
         extra = self._logika_odmah()
         mjesto = ""
@@ -477,7 +485,7 @@ class LinaAgent(Agent):
                 kontekst=self.kontekst,
                 vrijeme=self.vrijeme,
                 chat_ctx=self.chat_ctx.copy(exclude_instructions=True),
-                tools=list(self.tools),
+                tools=list(self.extra_tools),
             ),
             "Predaj kraj razgovora.",
         )
@@ -501,6 +509,9 @@ class PozdravAgent(Agent):
         )
         self.stanje = stanje
         self.store = store
+        # Nur von außen übergebene Tools (z. B. end_call) weitergeben, nie die
+        # eigenen @function_tool-Methoden: sonst doppelte Namen beim Handoff.
+        self.extra_tools = list(tools or [])
         self.kontekst = kontekst
         self.vrijeme = vrijeme
 
@@ -554,7 +565,7 @@ class PozdravAgent(Agent):
                 kontekst=self.kontekst,
                 vrijeme=self.vrijeme,
                 chat_ctx=self.chat_ctx.copy(exclude_instructions=True),
-                tools=list(self.tools),
+                tools=list(self.extra_tools),
             ),
             "Nastavi prikupljanje.",
         )
@@ -583,6 +594,9 @@ class KrajAgent(Agent):
         )
         self.stanje = stanje
         self.store = store
+        # Nur von außen übergebene Tools (z. B. end_call) weitergeben, nie die
+        # eigenen @function_tool-Methoden: sonst doppelte Namen beim Handoff.
+        self.extra_tools = list(tools or [])
 
     @function_tool
     async def zavrsi_razgovor(
