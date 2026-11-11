@@ -160,10 +160,23 @@ def broj_djece(v: str) -> Rez:
     )
 
 
+DOB_DJECE_TEKST = ("mala", "veća", "mala i veća")
+
+
 def dob_djece(v: str) -> Rez:
+    t = " ".join(v.lower().split()).replace("veca", "veća")
+    if t in ("mali", "male"):
+        t = "mala"
+    if t in ("veći", "veci", "veće", "vece", "veliki", "velika"):
+        t = "veća"
+    if t in DOB_DJECE_TEKST:
+        return t, None
     dob = [x.strip() for x in v.split(",") if x.strip()]
     if not dob or not all(x.isdigit() and int(x) < 60 for x in dob):
-        return None, "Godine djece kao brojevi odvojeni zarezom, npr. '4, 9'."
+        return None, (
+            "Godine djece kao brojevi odvojeni zarezom, npr. '4, 9', "
+            "ili 'mala', 'veća', 'mala i veća'."
+        )
     return ", ".join(dob), None
 
 

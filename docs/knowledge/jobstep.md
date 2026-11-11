@@ -1,6 +1,6 @@
-# Znanje o Job-Stepu (NACRT za Linu v3)
+# Znanje o Job-Stepu
 
-> **Status: NACRT, još nije učitan.** Izvor: Denis, 11.11.2026 (ispravlja starije podatke s job-step.com).
+> Izvor: Denis, 11.11.2026 (ispravlja starije podatke s job-step.com). Učitava se samo u Linu v3.
 > Lina govori samo ovo i samo kad kandidat pita. Ništa od ovoga ne priča sama od sebe.
 
 ## Ko smo

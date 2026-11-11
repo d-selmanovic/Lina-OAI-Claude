@@ -1,6 +1,6 @@
 # Plan Lina 3.0 – „locker wie Alma, korrekt wie Lina“
 
-Stand: 11.11.2026 · Status: **Entwurf, wartet auf „bestätige“** · Branch: `lina-3-prompt` (noch nicht angelegt)
+Stand: 11.11.2026 · Status: **freigegeben von Denis 11.11.2026, Schritt 1 gebaut, Test mit Stimme offen** · Branch: `lina-3-prompt`
 Basis: `main` @ `af8cfbb`, `src/lina/prompts.py`. Zeilenangaben beziehen sich auf diesen Stand.
 
 ## 0. Ziel und Leitplanken
@@ -278,5 +278,5 @@ Heute ist `jobstep.md` ein **Platzhalter** und wird **nicht** in Linas Instrukti
 Danach: `_znanje()` lädt `jobstep.md` zusätzlich, Prompt-Länge messen.
 
 ## 14. Offen von Denis
-- [ ] „bestätige“ für diesen Plan
+- [x] „bestätige“ für diesen Plan (11.11.2026)
 - [ ] Job-Step-Fakten für den Gesprächsstoff: Standort, häufigste Bewerberfragen (spätestens für Schritt 2)

@@ -188,7 +188,7 @@ class LinaAgent(Agent):
         drzavljanstvo: BiH, Srbija, Hrvatska, Crna Gora, Sjeverna Makedonija, Kosovo, Albanija, Slovenija (kommagetrennt) oder 'Drugo – <država>'
         bracno_stanje: Neoženjen/Neudata | Oženjen/Udata | Vanbračna zajednica | Razveden/Razvedena | Udovac/Udovica
         njemacki, engleski: Nema | Osnove (A1–A2) | Srednje (B1–B2) | Napredno (C1–C2)
-        djeca: Da | Ne;  broj_djece: Zahl;  dob_djece: Zahlen kommagetrennt, z. B. '4, 9'
+        djeca: Da | Ne;  broj_djece: Zahl;  dob_djece: Zahlen kommagetrennt, z. B. '4, 9', oder 'mala' | 'veća' | 'mala i veća'
         datum_rodjenja: YYYY-MM-DD;  email: vollständige Adresse;  mjesto_rodjenja, adresa, vjestine: Text
 
         Args:
@@ -205,6 +205,12 @@ class LinaAgent(Agent):
                 "MAPA:adresa",
                 "Samo da provjerim — ta ulica je u tom gradu?",
                 mapa.ulica_u_gradu(w),
+            )
+        if polje == "datum_rodjenja" and self.stanje.dob_iznad_granice():
+            extra = (
+                "KRAJ: kandidat ima četrdeset pet ili više godina. Ne pitaj dalje. Reci mirno da "
+                "zbog uslova za radnu dozvolu u Njemačkoj ne možemo dalje s kandidatima od četrdeset "
+                "pet i više godina, zahvali, pa zavrsi_razgovor (nije_zainteresiran)."
             )
         return f"Sačuvano: {polje} = {w}." + (f"\n{extra}" if extra else "")
 
@@ -223,13 +229,14 @@ class LinaAgent(Agent):
         drzava: str = "",
         opis: str = "",
     ) -> str:
-        """Fügt EINE Berufsstation hinzu, sobald Jahre genannt sind. Nicht auf eine zweite Bestätigung warten.
+        """Fügt EINE Berufsstation hinzu. Nicht auf eine zweite Bestätigung warten.
+        Jahr wichtig, Monat optional, ungefähr erlaubt. Ohne Jahr nur, wenn die Instruktionen das erlauben.
         Der Rückgabewert kann PREKLAPANJE enthalten — das ist die nächste gesprochene Frage.
 
         Args:
             pozicija: Tätigkeit, z. B. 'Zidar'.
             poslodavac: Firma.
-            od: Beginn als YYYY oder YYYY-MM.
+            od: Beginn als YYYY oder YYYY-MM; leer, wenn unbekannt.
             do: Ende als YYYY oder YYYY-MM; leer, wenn aktuell.
             aktuelno: True, wenn er dort noch arbeitet.
             grad: Stadt.

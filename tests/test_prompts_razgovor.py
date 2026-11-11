@@ -1,6 +1,6 @@
-"""Vertrags-Tests für Voice-Instructions (Gesprächsführung, kein LiveKit)."""
+"""Vertrags-Tests für den eingefrorenen Prompt v2 (prompts_v2.py). Asserts unverändert."""
 
-from lina.prompts import BACKEND, VOICE, VOICE_POZDRAV
+from lina.prompts_v2 import BACKEND, VOICE, VOICE_POZDRAV
 
 
 def test_voice_keine_fragebogen_floskeln():
@@ -56,7 +56,7 @@ def test_voice_ablauf_skakanje_smalltalk():
 
 
 def _sve_voice():
-    from lina import prompts
+    from lina import prompts_v2 as prompts
 
     return (
         prompts.VOICE,
@@ -69,7 +69,7 @@ def test_gpt_live_politike_u_svakom_voice_promptu():
     for tpl in _sve_voice():
         assert "{zajednicko}" in tpl
         assert "{delegacija}" in tpl
-    from lina.prompts import _DEL_KRAJ, _DEL_PODACI, _DEL_POZDRAV, _ZAJEDNICKO
+    from lina.prompts_v2 import _DEL_KRAJ, _DEL_PODACI, _DEL_POZDRAV, _ZAJEDNICKO
 
     for naslov in ("Backchannel policy:", "Interruption policy:"):
         assert naslov in _ZAJEDNICKO
@@ -81,7 +81,7 @@ def test_gpt_live_politike_u_svakom_voice_promptu():
 
 
 def test_halo_ispravke_iskrenost():
-    from lina.prompts import _ZAJEDNICKO
+    from lina.prompts_v2 import _ZAJEDNICKO
 
     assert "Nikad ne ponavljaj pozdrav" in _ZAJEDNICKO
     assert "ponovi NOVU vrijednost" in _ZAJEDNICKO
@@ -96,7 +96,7 @@ def test_njemacki_prvi_i_ponuda_prije_iskustva():
 
 
 def test_pozdrav_bez_iskustva_i_kratko_ponavljanje():
-    from lina import prompts
+    from lina import prompts_v2 as prompts
 
     t = prompts.VOICE_POZDRAV
     assert "Nikad u pozdravu ne pitaj za iskustvo" in t
@@ -105,20 +105,20 @@ def test_pozdrav_bez_iskustva_i_kratko_ponavljanje():
 
 
 def test_jezici_odvojeno():
-    from lina import prompts
+    from lina import prompts_v2 as prompts
 
     assert "Nikad „njemačkog ili engleskog“ u istom pitanju" in prompts.VOICE
 
 
 def test_oprostaj_tek_poslije_kraja():
-    from lina import prompts
+    from lina import prompts_v2 as prompts
 
     assert "Nikad se ne opraštaj" in prompts._ZAJEDNICKO
     assert "Veza je loša" in prompts._DEL_PODACI
 
 
 def test_ponuda_jedno_pitanje():
-    from lina import prompts
+    from lina import prompts_v2 as prompts
 
     assert "Pitaj koja ga zanima i gdje ima iskustva" not in prompts.VOICE
     assert "Pitaj samo koja ga zanima. Čekaj odgovor." in prompts.VOICE

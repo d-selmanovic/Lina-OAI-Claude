@@ -3,7 +3,18 @@
 Versionsnummer: `pyproject.toml` (Hauptversion.Funktion.Korrektur). Ablauf: `docs/DEPLOY.md`.
 „LiveKit-Version“ = ID aus `lk agent status` (für `lk agent rollback`).
 
-## Merge dev → main – in Arbeit (Branch `merge-dev`)
+## 3.0.0 – in Arbeit (Branch `lina-3-prompt`, noch nicht abgenommen)
+- Umschaltbar über `LINA_PROMPT` (`v2` Standard, `v3` neu); Langfuse-Metadatum `lina.prompt_verzija`.
+- `prompts_v2.py` + `docs/knowledge/znanje-lina-v2.md`: eingefrorener Produktions-Prompt (geprüft zeichengleich mit `af8cfbb`).
+- Prompt v3: Persona als Mensch (Iskrenost bleibt), Emotion/Humor/Smalltalk, eine Tempo-Regel,
+  Verhalten während Tools, die fünf Regeln aus 0.2.2, Alter ab 45 (Grund Arbeitserlaubnis),
+  Kinder „mali ili veći“, Jahre ungefähr/ohne Jahr, Gehalt brutto zuerst.
+- Wissen: `jobstep.md` geladen (nur v3), auch in der Abschlussphase; Fahrer arbeitet auf der Baustelle mit.
+- Code: 45+ beendet in v3 mit Vermerk „Dob 45+ – ne ispunjava uslov.“ im Sažetak (Ishod bleibt
+  `nije_zainteresiran`); `dob_djece` nimmt auch „mala“, „veća“, „mala i veća“.
+- Szenarien: `scenarios-lina3.yaml` (S1–S19, P1–P3).
+
+## Merge dev → main – 11.11.2026 (Commit `988e23a`)
 - Aus dev übernommen: Langfuse-Dialog beider Seiten (`src/lina/dialog.py`), Version und
   Environment in Langfuse, Simulationen nur manuell, Wartezeit am Simulationsende,
   `testanruf*.json` ignoriert (zusätzlich bleibt `allowlist-testanruf.json`), DEPLOY-Ablauf,

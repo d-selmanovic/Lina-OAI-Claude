@@ -6,7 +6,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal
 
+from .datumi import parse_datum
 from .kontekst import Kontekst, Skola, Stanica
+from .verzija import granica_godina, je_v3
 
 Ishod = Literal[
     "zavrseno",  # Datenerfassung abgeschlossen
@@ -69,6 +71,21 @@ class Stanje:
         if self.podaci or self.nove_stanice or self.nove_skole:
             return "djelimicno"
         return "prekinuto"
+
+    def godine_kandidata(self) -> int | None:
+        """Alter heute aus dem im Gespräch genannten oder vorhandenen Geburtsdatum."""
+        dr = self.kontekst.datum_rodjenja
+        if "datum_rodjenja" in self.podaci:
+            dr = parse_datum(self.podaci["datum_rodjenja"], kraj=False) or dr
+        if dr is None:
+            return None
+        d, danas = dr.datum, self.sada().date()
+        return danas.year - d.year - ((danas.month, danas.day) < (d.month, d.day))
+
+    def dob_iznad_granice(self) -> bool:
+        """v3: Kandidat ist 45 oder älter (Entscheidung E3). In v2 immer False."""
+        g = self.godine_kandidata()
+        return je_v3() and g is not None and g >= granica_godina()
 
     def dob_djece(self) -> list[int]:
         return [

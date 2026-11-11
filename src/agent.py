@@ -128,7 +128,11 @@ async def my_agent(ctx: JobContext):
 
     # Langfuse (optional): vor dem Sessionstart, damit alle Spans ankommen.
     langfuse = setup_langfuse(
-        metadata={"langfuse.session.id": ctx.room.name, "lina.record_id": record_id}
+        metadata={
+            "langfuse.session.id": ctx.room.name,
+            "lina.record_id": record_id,
+            "lina.prompt_verzija": prompts.aktivna_verzija(),
+        }
     )
     trace_provider, dialog_prozessor = (
         langfuse if langfuse is not None else (None, None)

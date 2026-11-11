@@ -19,6 +19,7 @@ from .config import (
     P,
 )
 from .datumi import Datum, parse_datum
+from .verzija import granica_godina
 
 Fields = dict[str, Any]
 
@@ -128,9 +129,11 @@ class Kontekst:
             d = self.datum_rodjenja.datum
             danas = date.today()
             godine = danas.year - d.year - ((danas.month, danas.day) < (d.month, d.day))
-            if godine >= 60:
+            if godine >= granica_godina():
                 linije.append(
-                    "Godine: šezdeset ili više. Ne pitaj dalje. Reci da je posao težak fizički rad napolju i završi poziv."
+                    "Godine: četrdeset pet ili više. Ne pitaj dalje. Reci da zbog uslova za radnu dozvolu u Njemačkoj ne možemo dalje i završi poziv (nije_zainteresiran)."
+                    if granica_godina() == 45
+                    else "Godine: šezdeset ili više. Ne pitaj dalje. Reci da je posao težak fizički rad napolju i završi poziv."
                 )
         sumnjive = [s.skola for s in self.skole if s.skola and not _skola_ok(s.skola)]
         if sumnjive:

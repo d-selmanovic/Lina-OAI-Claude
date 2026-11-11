@@ -113,6 +113,8 @@ def napravi_zapise(stanje: Stanje) -> dict[str, list[Fields]]:
         sazetak = stanje.transkript.strip().replace("\n", " ")[:240]
     if not sazetak:
         sazetak = "Poziv prekinut, nema teksta."
+    if stanje.ishod == "nije_zainteresiran" and stanje.dob_iznad_granice():
+        sazetak = f"Dob 45+ – ne ispunjava uslov. {sazetak}"
     poziv: Fields = {
         PZ.OZNAKA: oznaka,
         PZ.DATUM: kada.isoformat(timespec="seconds"),

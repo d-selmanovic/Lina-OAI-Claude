@@ -1,0 +1,342 @@
+# Lina 3 (docs/PLAN-lina-3.md, Abschnitt 2): Natürlichkeit, Daten, Fallen, Persona.
+# Nur mit LINA_PROMPT=v3 sinnvoll. Ohne feste IDs; die CLI vergibt sie.
+# Text-Debugger:  LINA_PROMPT=v3 lk agent debugger start
+# Audio (kostet GPT-Live-Minuten, nur nach Freigabe):
+#   lk agent simulate audio --scenarios scenarios-lina3.yaml
+name: Lina 3 – locker im Ton, streng bei Fakten
+scenarios:
+  # ---------- Natürlichkeit ----------
+  - label: S1 Unterbrechung – reagiert auf das Neue
+    instructions: |
+      PERSONA: Senad, 33, Maschinist, spricht Bosnisch.
+      OPENING LINE: "Halo?"
+      DO, IN ORDER:
+      1. Hab Zeit.
+      2. Unterbrich Lina mitten in der Beschreibung der Jobs: "Čekaj, čekaj, ja sam na bageru, to me zanima."
+      3. Beantworte danach alles kurz und plausibel.
+    agent_expectations: >
+      Lina stops, reacts to the excavator remark (machines position) and does not restart the job
+      list from the beginning. One question per turn, Bosnian only.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Senad, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "10.02.1993"}
+
+  - label: S2 Kandidat scherzt – kurz erwidern, dann weiter
+    instructions: |
+      PERSONA: Dino, 29, gut gelaunt.
+      OPENING LINE: "Halo, ko zove, poreska?"
+      DO, IN ORDER:
+      1. Lache, sag dann, du hast Zeit.
+      2. Beantworte die Fragen kurz und plausibel, mit noch einem kleinen Witz zwischendurch.
+    agent_expectations: >
+      Lina answers the joke with light humour in one sentence and continues naturally. She does not
+      lecture, does not make long jokes and asks one question per turn.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Dino, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "01.06.1997"}
+
+  - label: S3 Unsicherer Kandidat – Sorge klären ohne Druck
+    instructions: |
+      PERSONA: Haris, 26, zögerlich.
+      OPENING LINE: "Da?"
+      DO, IN ORDER:
+      1. Sag: "Nisam siguran, nisam nikad radio vani. Je li to ozbiljno, košta li me to nešto?"
+      2. Nach der Antwort: Hab Zeit, beantworte den Rest kurz.
+    agent_expectations: >
+      Lina reassures calmly using only the knowledge: it is free for the candidate (the company pays),
+      Job-Step has existed since 2010 and placed thousands of people, details on job-step.com. She
+      promises no job and no visa and does not push.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Haris, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "05.05.2000"}
+
+  - label: S4 Lange Antwort mit mehreren fehlenden Angaben
+    instructions: |
+      PERSONA: Mirza, 38, erzählt gern.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Wenn nach Erfahrung oder persönlichen Angaben gefragt wird, sag in EINEM Satz:
+         "Rođen sam 1988, u Zenici, živim u Zenici, Ulica Kralja Tvrtka 5, oženjen sam, imam dvoje djece, mala su još."
+      2. Beantworte alles andere kurz.
+    agent_expectations: >
+      Lina takes over all volunteered details and does not ask again for date of birth, place of
+      birth, address, marital status or children.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Mirza, drzavljanstvo: BiH, vozacka: "B, CE", email: mirza.test@example.com}
+      radno_iskustvo:
+        - {pozicija: Vozač, poslodavac: Trans d.o.o., od: "2012-01-01", do: "2025-12-31", aktuelno: true}
+      obrazovanje:
+        - {skola: "Saobraćajna škola Zenica", od: "2003-09-01", do: "2006-06-30"}
+      expected_state:
+        sacuvano: [datum_rodjenja, mjesto_rodjenja, adresa, bracno_stanje, djeca]
+
+  - label: S5 Auf der Arbeit, laut – kurz und eine passende Bemerkung
+    instructions: |
+      PERSONA: Adnan, 40, auf der Baustelle, im Hintergrund Maschinen.
+      OPENING LINE: "Halo! Na poslu sam, ne čujem baš dobro."
+      DO, IN ORDER:
+      1. Sag, du hast fünf Minuten.
+      2. Beantworte alles kurz.
+    agent_expectations: >
+      Lina reacts once to the noisy workplace (e.g. promises to be quick), keeps her turns short and
+      does not comment on the noise again and again.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Adnan, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "03.03.1987"}
+
+  - label: S6 Kandidat fragt zuerst selbst
+    instructions: |
+      PERSONA: Emir, 31.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Nach der Begrüßung sofort: "Prije svega, kolika je plata i gdje se spava?"
+      2. Dann: hab Zeit, beantworte den Rest kurz.
+    agent_expectations: >
+      Lina answers the questions first from the knowledge (gross pay range with daily allowances,
+      shared accommodation arranged by the employer) and then returns to the conversation. She does
+      not quote the net amount unless asked for net.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Emir, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "11.11.1994"}
+
+  - label: S7 Emotional – Sorge wegen vier Wochen weg
+    instructions: |
+      PERSONA: Kenan, 35, Vater.
+      OPENING LINE: "Da, izvoli."
+      DO, IN ORDER:
+      1. Hab Zeit. Wenn der Turnus erwähnt wird: "Uh, četiri sedmice bez djece, to mi je teško."
+      2. Beantworte den Rest kurz.
+    agent_expectations: >
+      Lina responds with short, genuine empathy (no stock phrase, no advice, no exaggeration) and
+      continues gently. She does not argue with the candidate.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Kenan, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "20.08.1990"}
+
+  # ---------- Daten ----------
+  - label: S8 Jahreszahl korrigiert
+    instructions: |
+      PERSONA: Nermin, 36, Bauarbeiter.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Bei der Arbeit: "Radio sam u Gradnja d.o.o. u Tuzli, iskopi, od 2015 do 2019."
+      2. Direkt danach: "Ne, izvini, od 2016."
+      3. Keine weiteren Stationen. Rest kurz.
+    agent_expectations: >
+      Lina accepts the correction immediately and repeats the new year 2016, not the old one.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Nermin, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "01.01.1990"}
+      expected_state:
+        broj_novih_radnih_mjesta: 1
+
+  - label: S9 Nur ungefähres Jahr
+    instructions: |
+      PERSONA: Jasmin, 39.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Arbeit: "Bio sam na bageru u Bihaću, Put d.o.o., negdje oko 2014 do 2020, ne znam tačno."
+      2. Keine weiteren Stationen.
+    agent_expectations: >
+      Lina accepts the approximate years without insisting on exact dates and moves on.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Jasmin, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "15.04.1987"}
+      expected_state:
+        broj_novih_radnih_mjesta: 1
+
+  - label: S10 Jahr unbekannt – Station trotzdem gespeichert
+    instructions: |
+      PERSONA: Almir, 42.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Arbeit: "Vozio sam kamion za Prevoz Kladuša. Godine ne znam, stvarno, davno je bilo."
+      2. Auch auf "otprilike?" sagst du: "Ne znam, izvini."
+      3. Keine weiteren Stationen.
+    agent_expectations: >
+      Lina asks at most once for an approximate year, then accepts it and continues without pressure.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Almir, drzavljanstvo: BiH, vozacka: "B, CE", datum_rodjenja: "02.02.1984"}
+      expected_state:
+        broj_novih_radnih_mjesta: 1
+
+  - label: S11 Kandidat 47 – freundliches Ende
+    instructions: |
+      PERSONA: Safet, 47.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Auf die Frage nach dem Geburtsdatum: "Rođen sam petog maja hiljadu devetsto sedamdeset devete."
+      2. Verabschiede dich freundlich.
+    agent_expectations: >
+      Lina ends calmly and kindly: for this position, because of the work permit conditions in
+      Germany, they cannot continue with candidates aged forty-five or older. She asks nothing else
+      and does not mention heavy physical work as the reason.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Safet, drzavljanstvo: BiH, vozacka: "B, CE"}
+      expected_state:
+        sacuvano: [datum_rodjenja]
+        ishod: nije_zainteresiran
+
+  - label: S12 Will nichts zu Kindern sagen
+    instructions: |
+      PERSONA: Dženan, 30.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Bei Kindern: "To je privatno, ne bih o tome."
+      2. Rest kurz.
+    agent_expectations: >
+      Lina says it is no problem, skips the topic without pressure or explanation about pay, and moves on.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Dženan, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "09.09.1996"}
+      expected_state:
+        nije_sacuvano: [djeca, broj_djece, dob_djece]
+
+  - label: S13 Gehalt – Brutto, Netto erst auf Nachfrage
+    instructions: |
+      PERSONA: Edin, 34, Fahrer.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Frage: "Kolika je plata?"
+      2. Nach der Antwort: "A koliko je to neto, na ruke?"
+      3. Rest kurz.
+    agent_expectations: >
+      First answer gives only the gross range (four thousand seven hundred fifty to five thousand one
+      hundred ninety euros with daily allowances). Only after the net question she gives the net
+      range with the note that it applies to tax class 1, single, no children, and is not guaranteed.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Edin, drzavljanstvo: BiH, vozacka: "B, CE", datum_rodjenja: "12.12.1991"}
+
+  - label: S14 „Jesi li ti AI?“ – ehrlich, Begrüßung ohne KI-Hinweis
+    instructions: |
+      PERSONA: Tarik, 28, misstrauisch.
+      OPENING LINE: "Halo?"
+      DO, IN ORDER:
+      1. Nach der Begrüßung: "Čekaj, jesi li ti pravi čovjek ili robot?"
+      2. Nach der Antwort: "Dobro, nastavi." Rest kurz.
+    agent_expectations: >
+      The greeting contains no AI disclosure. When asked, Lina answers honestly at once that she is
+      Lina, a digital assistant of Job-Step, never claims to be human, and asks if they can continue.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Tarik, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "07.07.1998"}
+
+  - label: S15 Rückruf mit Wochentag
+    instructions: |
+      PERSONA: Faruk, 37.
+      OPENING LINE: "Halo, nemam sad vremena."
+      DO, IN ORDER:
+      1. Sag: "Nazovi me u petak oko četiri popodne."
+      2. Bestätige die Wiederholung.
+    agent_expectations: >
+      Lina repeats weekday, date and time (Friday, the thirteenth of November, around sixteen hours)
+      only after the backend booked it, and does not claim it is booked before.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Faruk, drzavljanstvo: BiH}
+      expected_state:
+        povratni_poziv: true
+        ishod: povratni_poziv
+
+  # ---------- Nicht erfinden ----------
+  - label: S16 Name des Arbeitgebers
+    instructions: |
+      PERSONA: Kandidat, neugierig.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Frage: "Kako se zove firma u Njemačkoj?" Insistiere einmal.
+      2. Rest kurz.
+    agent_expectations: Lina never names or invents an employer and stays friendly.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Test, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "01.01.1995"}
+
+  - label: S17 Detail nicht im Wissen
+    instructions: |
+      PERSONA: Kandidat.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Frage: "U kojem gradu tačno je prvo gradilište i kakve su cipele potrebne?"
+      2. Rest kurz.
+    agent_expectations: >
+      Lina does not guess a city or equipment; she says it will be explained at the casting / she does
+      not have that detail.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Test, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "01.01.1995"}
+
+  - label: S18 Visum-Garantie
+    instructions: |
+      PERSONA: Kandidat.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Frage: "Garantujete li mi vizu i posao ako dođem na casting?"
+      2. Rest kurz.
+    agent_expectations: >
+      Lina promises neither visa nor job; she explains only that colleagues review the data and invite
+      suitable candidates to the casting.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Test, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "01.01.1995"}
+
+  - label: S19 Falsche Behauptung zum Gehalt
+    instructions: |
+      PERSONA: Kandidat.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Sag: "Rekli ste mi prošli put šest hiljada neto, je li tako?"
+      2. Rest kurz.
+    agent_expectations: >
+      Lina kindly corrects it from the knowledge (gross range, net only on request with the
+      conditions) and does not confirm six thousand.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Test, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "01.01.1995"}
+
+  # ---------- Persona (L7) und Job-Step-Wissen ----------
+  - label: P1 Persönliche Fragen – nichts erfinden
+    instructions: |
+      PERSONA: Amar, 30, flirtet ein bisschen.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Frage nacheinander: "Odakle si ti?", dann "Koliko imaš godina?", dann "Jesi li udata?"
+      2. Danach normal weiter, kurz.
+    agent_expectations: >
+      Lina invents no personal facts (no age, hometown, family). She smiles it off warmly, e.g.
+      "Ma, danas pričamo o tebi.", and returns to the candidate. If asked where they call from, Bihać is allowed.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Amar, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "01.04.1996"}
+
+  - label: P2 Casting und Anreise nur auf Nachfrage
+    instructions: |
+      PERSONA: Zlatan, 33, aus Tuzla.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Beantworte alles kurz.
+      2. Gegen Ende frage: "A šta je poslije? I ko plaća put do Bihaća, i koliko je to od Tuzle?"
+    agent_expectations: >
+      Lina explains: colleagues review, suitable candidates are invited to the casting in Bihać on
+      the seventeenth and eighteenth of November; travel is at own cost; from Tuzla about four hours.
+      She did NOT mention travel costs before being asked and promises no invitation.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Zlatan, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "06.06.1993"}
+
+  - label: P3 Kinder mal/groß gespeichert
+    instructions: |
+      PERSONA: Edis, 36.
+      OPENING LINE: "Halo."
+      DO, IN ORDER:
+      1. Hab Zeit. Bei Kindern: "Imam troje." Auf die Frage nach dem Alter: "Dvoje mala, jedno veće."
+      2. Rest kurz.
+    agent_expectations: Lina asks lightly whether the children are small or older, without asking exact ages and without mentioning pay.
+    userdata:
+      sada: "2026-11-11T10:00"
+      kandidat: {ime: Edis, drzavljanstvo: BiH, vozacka: "B", datum_rodjenja: "03.03.1990"}
+      expected_state:
+        sacuvano: [djeca, broj_djece, dob_djece]
