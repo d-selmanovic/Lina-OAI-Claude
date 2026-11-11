@@ -22,8 +22,16 @@ Versionsnummer: `pyproject.toml` (Hauptversion.Funktion.Korrektur). Ablauf: `doc
 - Hörtest 11.11.2026: Lina verabschiedete sich nicht und legte nicht auf. Jetzt: warmer Abschied
   mit „ćao“ in derselben Antwort, und 40 s nach `predji_na_kraj` legt der Code auf, falls
   `zavrsi_razgovor` nicht kam (gespeichert wird dann über `ishod_bez_kraja()`).
-- Offen: v2 gilt hier noch nicht als eingefroren (Kontextzeile, Abschluss ohne Session, Backend low,
-  Sprachkorrektur wirken auch ohne v3). Vor einem Promote hinter `je_v3()` legen.
+- v2 eingefroren: Kontextzeile „Već imamo“, Abschluss ohne Session, `KrajAgent.on_enter`, Backend
+  low, Sprachkorrektur und der neue Text von `zavrsi_razgovor` wirken nur in v3.
+  `tests/test_v2_eingefroren.py` prüft die v2-Prompts zeichengleich gegen `lina-v2.0-prod`.
+  Für v2 wirken mit Absicht: Nummerierung der Korrekturen über alle Einträge (Fehlerkorrektur,
+  die Tool-Beschreibungen gelten für beide), Kartenabfragen im Thread, Tool-Beschreibungen.
+- v3-Prompt: Abschnitt „Ritam razgovora“ mit kurzem menschlichem Einstieg, Reaktion vor jeder
+  nächsten Frage, einer Neugier-Frage pro Station, Übergängen und Reaktionsbausteinen (nach Alma).
+- Sprachkorrektur zählt Hinweise statt Wörter; `on_enter` prüft das Ergebnis von `generate_reply`.
+- 2 Szenarien: Abschied mit Auflegen, Gesprächsrhythmus.
+- Offen: Unterbrechungsschwellen (Hörtest), Stimmenwahl per Anhören, Beispielsätze aus Bihać.
 
 ## 3.0.0 – in Arbeit (Branch `lina-3-prompt`, noch nicht abgenommen)
 - Umschaltbar über `LINA_PROMPT` (`v2` Standard, `v3` neu); Langfuse-Metadatum `lina.prompt_verzija`.

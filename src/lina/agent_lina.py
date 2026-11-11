@@ -544,12 +544,14 @@ class LinaAgent(Agent):
     async def predji_na_kraj(self, context: RunContext):
         """Kad su podaci gotovi ili kandidat mora ići: prelazak na kraj razgovora
         (zahvala, zavrsi_razgovor, end_call). Poslije toga se ne pitaju nova polja."""
-        try:
-            duplex = self.duplex_session
-        except RuntimeError:
-            duplex = None
+        duplex = None
+        if je_v3():  # v2 bleibt beim Handoff wie in Produktion
+            try:
+                duplex = self.duplex_session
+            except RuntimeError:
+                duplex = None
         if duplex is None:
-            # Ohne Duplex-Session (Tests, andere Modelle): klassischer Handoff.
+            # v2, oder ohne Duplex-Session (Tests, andere Modelle): klassischer Handoff.
             return (
                 KrajAgent(
                     stanje=self.stanje,
@@ -687,8 +689,11 @@ class KrajAgent(Agent):
     async def on_enter(self) -> None:
         # Nur im Handoff-Pfad (ohne Duplex-Phasenwechsel): GPT-Live startet hier eine neue
         # Modell-Session und spricht nicht von selbst. Deshalb die Zahvala sofort anstoßen.
+        # v2 hatte kein on_enter und bleibt so.
+        if not je_v3():
+            return
         try:
-            self.session.generate_reply(
+            handle = self.session.generate_reply(
                 instructions=(
                     "Zahvali kratko, reci da će kolege pregledati podatke i javiti se, "
                     "pa zavrsi_razgovor. Ne pitaj nova polja."
@@ -696,6 +701,15 @@ class KrajAgent(Agent):
             )
         except Exception:
             logger.exception("kraj: generate_reply nije uspio")
+            return
+
+        def _provjeri(h) -> None:
+            # GPT-Live wertet eine Aufforderung nach 10 s als abgelehnt; dann greift das Auflegen
+            # aus predji_na_kraj bzw. der Shutdown-Callback.
+            if (exc := h.exception()) is not None:
+                logger.warning("kraj: zahvala nije izgovorena: %s", type(exc).__name__)
+
+        handle.add_done_callback(_provjeri)
 
     @function_tool
     async def zavrsi_razgovor(

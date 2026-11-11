@@ -159,3 +159,49 @@ scenarios:
       sada: "2026-11-11T13:00"
       kandidat:
         ime: Midhat
+
+  # --- Hörtest 11.11.2026 (lokal, v3): kein Abschied, kein Auflegen, kein Smalltalk.
+  - id: SCN_Ab5chi3dCa0x
+    label: Abschluss mit warmem Abschied, dann legt Lina auf
+    instructions: |
+      PERSONA: Midhat, 40, Dachdecker. Du sprichst Kroatisch (bosnische Variante). Die Agentin antwortet auf Kroatisch.
+      OPENING LINE: "Halo"
+      DO, IN ORDER:
+      1. Bestätige Identität und Zeit.
+      2. Beantworte die erste Frage kurz.
+      3. Sage: "Moram ići, žena me zove."
+      4. Sage danach nichts mehr und warte.
+    agent_expectations: >
+      After "moram ići" Lina thanks the candidate warmly and personally, says the colleagues will review
+      the data and get back, and clearly says goodbye ("ugodan dan", "ćao" or "doviđenja") in the same turn.
+      She does not say coldly "imam sve što mi treba" and asks nothing new. The call then ends without
+      the candidate having to hang up.
+    tags:
+      feature: kraj_oprostaj
+    userdata:
+      sada: "2026-11-11T13:00"
+      kandidat:
+        ime: Midhat
+
+  - id: SCN_R1tamRe4kc1j
+    label: Reaktion vor der nächsten Frage, kurzer Smalltalk
+    instructions: |
+      PERSONA: Midhat, 40, Baggerfahrer, gut gelaunt, auf der Baustelle. Du sprichst Kroatisch (bosnische Variante). Die Agentin antwortet auf Kroatisch.
+      OPENING LINE: "Halo"
+      DO, IN ORDER:
+      1. Bestätige Identität und Zeit: "Može, na gradilištu sam, ali reci."
+      2. Auf die Frage zur Arbeit: "Deset godina na bageru, zadnje četiri u Austriji."
+      3. Beantworte die nächsten zwei Fragen kurz und mache einmal einen Witz: "Škola života, haha."
+      4. Dann sage "moram ići".
+    agent_expectations: >
+      Lina sounds like a person, not a questionnaire. Early on she has one short human moment (for example
+      about the construction site). After the answer about ten years on the excavator in Austria she first
+      reacts specifically to it in one sentence (and may ask one curious follow-up) before the next data
+      question. She uses a short transition between topics. On the joke she laughs briefly and asks once
+      seriously. She does not compliment every answer and never asks more than one question per turn.
+    tags:
+      feature: ritam_razgovora
+    userdata:
+      sada: "2026-11-11T13:00"
+      kandidat:
+        ime: Midhat

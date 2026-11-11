@@ -29,7 +29,7 @@ from livekit.agents import (
 from livekit.agents.beta import EndCallTool
 from livekit.plugins import ai_coustics
 
-from lina import jezik, prompts
+from lina import jezik, prompts, verzija
 from lina.agent_lina import PozdravAgent
 from lina.airtable import AirtableStore, FakeStore, Store, sacuvaj
 from lina.dialog import DialogProtokoll
@@ -114,6 +114,8 @@ def _responses_options(kontekst, vrijeme: str) -> dict:
         "model": os.getenv("LINA_BACKEND_MODEL", "gpt-5.6-luna"),
         "instructions": prompts.backend(kontekst, vrijeme),
     }
+    if not verzija.je_v3():  # v2 bleibt wie in Produktion (OpenAI-Standard)
+        return opts
     if effort := os.getenv("LINA_BACKEND_REASONING", "low").strip():
         opts["reasoning"] = {"effort": effort}
     if verbosity := os.getenv("LINA_BACKEND_VERBOSITY", "low").strip():
@@ -216,14 +218,15 @@ async def my_agent(ctx: JobContext):
     # Jezička korektura: GPT-Live kroz LiveKit nema keyword biasing. Hrvatska riječ ili
     # njemački/engleski uzvik u Lininom tekstu → kratka napomena u instrukcije (≤ 500 Tokens),
     # najviše jezik.MAX_ISPRAVKI puta po pozivu. Geloggt werden nur die Ersatzwörter.
-    ispravke_jezika: list[str] = []
+    ispravke_jezika: list[str] = []  # schon korrigierte Ersatzwörter
+    napomene_jezika = [0]  # gesendete Hinweise, höchstens jezik.MAX_ISPRAVKI
 
     @session.on("conversation_item_added")
     def _jezik_item(ev: ConversationItemAddedEvent) -> None:
         item = ev.item
-        if getattr(item, "role", None) != "assistant":
+        if getattr(item, "role", None) != "assistant" or not verzija.je_v3():
             return
-        if len(ispravke_jezika) >= jezik.MAX_ISPRAVKI:
+        if napomene_jezika[0] >= jezik.MAX_ISPRAVKI:
             return
         novi = [
             n
@@ -240,6 +243,7 @@ async def my_agent(ctx: JobContext):
             logger.debug("jezička napomena nije poslana", exc_info=True)
             return
         ispravke_jezika.extend(n.zamjena for n in novi)
+        napomene_jezika[0] += 1
         logger.info("jezička korektura: %s", ", ".join(n.zamjena for n in novi))
 
     @session.on("close")

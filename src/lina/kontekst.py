@@ -19,7 +19,7 @@ from .config import (
     P,
 )
 from .datumi import Datum, parse_datum
-from .verzija import granica_godina
+from .verzija import granica_godina, je_v3
 
 Fields = dict[str, Any]
 
@@ -116,7 +116,7 @@ class Kontekst:
             "Podaci koji NEDOSTAJU (pitaj samo ovo, ovim redom):",
             nedostaje,
         ]
-        if self.poznata_polja:
+        if self.poznata_polja and je_v3():  # v2 bleibt wie in Produktion
             linije.append(
                 "Već imamo iz prijave (NE pitaj, NE čitaj naglas, ne traži potvrdu): "
                 + ", ".join(self.poznata_polja)

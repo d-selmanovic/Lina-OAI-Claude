@@ -119,7 +119,8 @@ def test_tok_ponuda_nur_auf_wunsch_und_delegation_nach_jeder_antwort():
     v = prompts.VOICE
     assert "ne recituješ je" in v
     assert "SAMO ako kandidat pita" in v
-    assert "Odgovaraš samo na ono što je pitano, pa staneš" in v
+    assert "Ne nabrajaš\n  ostatak ponude" in v
+    assert "# Ritam razgovora" in v and "Reakcije" in v
     assert (
         "Četiri sedmice si na terenu" not in v
     )  # Kinder nicht mehr an Turnus/Plata gekoppelt
