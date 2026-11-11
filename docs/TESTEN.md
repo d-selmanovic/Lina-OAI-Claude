@@ -72,6 +72,7 @@ Lokal: `LINA_ENV=lokal` in `.env.local`, damit Tests nicht als `production` ersc
 ```bash
 lk agent simulate audio --scenarios scenarios.yaml
 lk agent simulate audio --scenarios scenarios-guardrails.yaml
+lk agent simulate audio --scenarios scenarios-neu.yaml
 lk agent simulate list
 ```
 Simulationen nutzen **keinen** Airtable-Zugriff: Kandidaten kommen aus `userdata`
