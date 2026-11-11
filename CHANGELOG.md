@@ -3,7 +3,7 @@
 Versionsnummer: `pyproject.toml` (Hauptversion.Funktion.Korrektur). Ablauf: `docs/DEPLOY.md`.
 „LiveKit-Version“ = ID aus `lk agent status` (für `lk agent rollback`).
 
-## 1.1.0 – staging, 11.11.2026 (Branch `lina-3-prompt-v2`, noch nicht abgenommen)
+## 1.1.0 – staging, 11.11.2026 (Branch `lina-3-prompt-v2`, Git-Tag `v1.1.0-rc.1` = Commit `847c444`, LiveKit-Version `mshPFHzUFdGr`, noch nicht abgenommen)
 - Staging läuft ohne Secret mit v3 (`LIVEKIT_AGENT_DEPLOYMENT=staging`), production bleibt v2.
   Grund: LiveKit-Secrets gelten für alle Deployments eines Agents.
 - Nach dem Testanruf vom 11.11.2026 (andere Claude-Sitzung, Punkte 1–8 und 10 der Analyse,
