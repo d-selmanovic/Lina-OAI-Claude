@@ -51,10 +51,22 @@ Den ausgegebenen Agent-Console-Link öffnen, Mikrofon erlauben und sprechen.
 Nach dem Deploy geht das auch direkt in der Agent Console der Cloud (siehe `docs/DEPLOY.md`).
 
 ## 4a. Langfuse prüfen
-Mit gesetzten `LANGFUSE_*`-Variablen erscheinen die Traces pro Gespräch (Session = Raumname).
-Entscheidung (05.11.2026): **alles inkl. Gesprächsinhalte** (`LANGFUSE_INHALTE=1`): Transkripte,
-Tool-Argumente, Instruktionen plus Dauer, Tool-Aufrufe und Kosten. Das sind Personendaten der Kandidaten.
-Ist im LiveKit-Projekt „PII redaction“ aktiv, entfernt LiveKit die Inhalte trotzdem.
+Mit gesetzten `LANGFUSE_*`-Variablen erscheint pro Gespräch ein Trace (Session = Raumname,
+Metadaten `lina.record_id`, Environment `production` / `staging` / `lokal`).
+Entscheidung (05.11.2026): **alles inkl. Gesprächsinhalte** (`LANGFUSE_INHALTE=1`).
+
+Was Langfuse bekommt (`src/lina/dialog.py`):
+- **agent_turn**: Input = Kandidatenaussage(n) seit dem letzten Turn + Linas vorherige Frage,
+  Output = Linas Antwort + `unterbrochen`.
+- **agent_session** (Wurzel): Output = ganzer Dialog in Reihenfolge (`rolle` kandidat/lina,
+  `role` user/assistant, Text, Zeit, unterbrochen) + Ergebnis (`ishod`, `sazetak`).
+  Auch als `langfuse.trace.output` für ältere Trace-Evaluatoren.
+- Telefonnummern (Ziffern) und Secrets sind maskiert. Gesprochene Zahlwörter nicht.
+
+Prüfen nach einem Testanruf: Langfuse → Traces → Environment filtern → Trace öffnen →
+`agent_session` Output (ganzer Dialog) und einzelne `agent_turn` (Input/Output).
+
+Lokal: `LINA_ENV=lokal` in `.env.local`, damit Tests nicht als `production` erscheinen.
 
 ## 5. Simulationen (kosten Inferenz)
 ```bash

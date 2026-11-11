@@ -5,9 +5,9 @@
 # Lina nutzt GPT-Live (audio-only) → Simulationen laufen im Audio-Modus.
 name: Simulations
 
+# Nur manuell (GitHub → Actions → Simulations → Run workflow): Audio-Simulationen kosten
+# Echtzeit-Minuten + GPT-Live. Braucht LIVEKIT_URL/API_KEY/API_SECRET als Repo-Secrets.
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
 
 permissions:

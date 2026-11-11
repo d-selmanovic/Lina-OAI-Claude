@@ -36,5 +36,5 @@ KMS
 CLAUDE.local.md
 
 # Testanrufe (enthalten Telefonnummern)
-testanruf.json
+testanruf*.json
 allowlist-testanruf.json

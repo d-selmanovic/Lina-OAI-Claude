@@ -46,6 +46,7 @@ Zweistufiger Outbound-Prozess:
 ## Datenschutz und Secrets
 - Kandidatendaten sind personenbezogen: keine Namen, Telefonnummern oder Dokumentinhalte in Logs. Nur Record-IDs loggen.
 - Ausnahme mit Absicht: Langfuse speichert vollständige Gespräche (`LANGFUSE_INHALTE=1`, Entscheidung Denis 05.11.2026) zur Absicherung.
+  Beide Seiten (Kandidat + Lina) über `src/lina/dialog.py`; Telefonnummern und Secrets werden vor dem Export maskiert.
 - Keys nur in `.env.local` (gitignored). Nie in Code, Commits oder Chat.
 
 ## Code-Struktur

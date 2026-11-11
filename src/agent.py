@@ -7,6 +7,7 @@ Kandidat: Dispatch-Metadaten `{"record_id": "rec..."}`. Nur zum lokalen Testen o
 gilt `LINA_TEST_RECORD_ID` (Test-Kandidat K-0196).
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -17,6 +18,8 @@ from livekit.agents import (
     AMD,
     AgentServer,
     AgentSession,
+    CloseEvent,
+    ConversationItemAddedEvent,
     JobContext,
     SimulationContext,
     cli,
@@ -29,10 +32,11 @@ from livekit.plugins import ai_coustics
 from lina import prompts
 from lina.agent_lina import PozdravAgent
 from lina.airtable import AirtableStore, FakeStore, Store, sacuvaj
+from lina.dialog import DialogProtokoll
 from lina.kontekst import izracunaj
 from lina.simulacija import paket_iz_userdata, razlike
 from lina.stanje import Stanje
-from lina.telemetrie import setup_langfuse
+from lina.telemetrie import setup_langfuse, umgebung
 from lina.zeit import TZ, opis
 
 logger = logging.getLogger("agent")
@@ -65,6 +69,13 @@ async def on_simulation_end(sim: SimulationContext) -> None:
         sim.fail(reason="Session wurde nicht gestartet")
         return
     stanje: Stanje = session.userdata
+    # GPT-Live delegiert asynchron: Die Simulation endet oft mit Linas Abschiedssatz, bevor das
+    # Backend die letzten Angaben gespeichert hat. Kurz warten, bis der Abschluss gemeldet ist.
+    for _ in range(20):
+        if stanje.ishod is not None:
+            break
+        await asyncio.sleep(0.5)
+    await asyncio.sleep(1.0)
     if fehler := razlike(stanje, expected):
         sim.fail(reason="; ".join(fehler))
 
@@ -116,8 +127,11 @@ async def my_agent(ctx: JobContext):
     ctx.log_context_fields = {"room": ctx.room.name, "record_id": record_id}
 
     # Langfuse (optional): vor dem Sessionstart, damit alle Spans ankommen.
-    trace_provider = setup_langfuse(
+    langfuse = setup_langfuse(
         metadata={"langfuse.session.id": ctx.room.name, "lina.record_id": record_id}
+    )
+    trace_provider, dialog_prozessor = (
+        langfuse if langfuse is not None else (None, None)
     )
     if trace_provider is not None:
 
@@ -156,6 +170,32 @@ async def my_agent(ctx: JobContext):
         vad=inference.VAD(model="silero"),
         userdata=stanje,
     )
+
+    # Gesprächsverlauf beider Seiten für Langfuse (Kandidat + Lina), siehe lina/dialog.py
+    protokoll = DialogProtokoll()
+    if dialog_prozessor is not None:
+        dialog_prozessor.binde(
+            protokoll,
+            {
+                "record_id": record_id,
+                "umgebung": umgebung(),
+                "anzahl_fehlender_angaben": len(kontekst.nedostaje),
+            },
+        )
+
+    @session.on("conversation_item_added")
+    def _dialog_item(ev: ConversationItemAddedEvent) -> None:
+        protokoll.dodaj(ev.item)
+
+    @session.on("close")
+    def _dialog_kraj(ev: CloseEvent) -> None:
+        # läuft vor dem Ende des agent_session-Spans, der den ganzen Dialog bekommt
+        protokoll.abschluss = {
+            "ishod": stanje.ishod or stanje.ishod_bez_kraja(),
+            "sazetak": stanje.sazetak,
+            "razlog_kraja": str(getattr(ev, "reason", "") or ""),
+        }
+        protokoll.beendet = True
 
     async def spremi_na_kraju() -> None:
         if stanje.sacuvano:

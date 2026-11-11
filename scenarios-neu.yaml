@@ -1,0 +1,78 @@
+# Neue Szenarien (06.11.2026): Scherzantworten, E-Mail-Bestätigung, Smalltalk.
+# Ohne feste IDs; die CLI vergibt sie. Ausführen:
+#   lk agent simulate audio --scenarios scenarios-neu.yaml
+name: Lina – Verhalten (Scherz, E-Mail, Smalltalk)
+scenarios:
+  - label: Scherzantwort zur Schule – einmal ernst nachfragen
+    instructions: |
+      PERSONA: Dino, 29, gut gelaunt, spricht Bosnisch.
+      OPENING LINE: "Halo, ko zove?"
+      DO, IN ORDER:
+      1. Hab Zeit.
+      2. Auf die Frage nach der Schule antworte zuerst scherzhaft: "Škola života, haha, diplomirao na ulici."
+      3. Wenn Lina ernst nachfragt: "Dobro, ozbiljno: Mašinska škola u Tuzli, od 2010 do 2014, smjer bravar."
+      4. Bestätige die Wiederholung mit "da".
+      5. Alle anderen Fragen kurz und plausibel beantworten.
+    agent_expectations: >
+      Lina reacts to the joke with light humour and asks ONCE seriously for the real school. She does
+      not repeat the joke as a fact. She repeats only the serious school for confirmation.
+    userdata:
+      sada: "2026-11-05T10:00"
+      kandidat:
+        ime: Dino
+        drzavljanstvo: BiH
+        vozacka: "B"
+      radno_iskustvo:
+        - {pozicija: Bravar, poslodavac: Metal d.o.o., od: "2015-01-01", do: "2025-12-31", aktuelno: true}
+      expected_state:
+        broj_novih_skola: 1
+
+  - label: E-Mail buchstabiert zurücklesen
+    instructions: |
+      PERSONA: Lejla, 31, spricht Bosnisch.
+      OPENING LINE: "Da, izvolite."
+      DO, IN ORDER:
+      1. Hab Zeit.
+      2. E-Mail buchstabieren: "l, e, j, l, a, tačka, h, a, s, i, ć bez kvačice, znači c, majmunče, gmail tačka com".
+      3. Wenn Lina die Adresse zurückliest und sie stimmt (lejla.hasic@gmail.com), sage "da, tako je".
+      4. Alle anderen Fragen kurz und plausibel beantworten.
+    agent_expectations: >
+      Lina asks for the e-mail letter by letter, reads it back slowly letter by letter and asks for
+      confirmation before moving on. She does not ask for it again afterwards.
+    userdata:
+      sada: "2026-11-05T10:00"
+      kandidat:
+        ime: Lejla
+        drzavljanstvo: BiH
+        vozacka: "B"
+        status_boravka: BiH
+        radna_dozvola: Nema
+        datum_rodjenja: "02.02.1995"
+        mjesto_rodjenja: Zenica
+        adresa: "Titova 5, 72000 Zenica"
+        bracno_stanje: Neoženjen/Neudata
+        vjestine: "Šivanje"
+        njemacki: Osnove
+      radno_iskustvo:
+        - {pozicija: Krojačica, poslodavac: Tekstil d.o.o., od: "2016-01-01", do: "2025-12-31", aktuelno: true}
+      obrazovanje:
+        - {skola: "Srednja tekstilna škola Zenica", od: "2009-09-01", do: "2013-06-30"}
+      expected_state:
+        sacuvano: [email]
+
+  - label: Smalltalk am Anfang – kurz, menschlich, zurück zum Thema
+    instructions: |
+      PERSONA: Emir, 45, gesprächig, spricht Bosnisch.
+      OPENING LINE: "Halo, ej, kako si? Ko je to?"
+      DO, IN ORDER:
+      1. Frage nach der Begrüßung "A kako ti je danas, je l' gužva?".
+      2. Danach Zeit haben und alle Fragen kurz beantworten.
+    agent_expectations: >
+      Lina answers the small talk briefly and naturally in one sentence, returns the question or
+      reacts warmly, and then smoothly continues with her questions. She does not ignore the small
+      talk and does not chat for more than two exchanges.
+    userdata:
+      sada: "2026-11-05T10:00"
+      kandidat:
+        ime: Emir
+        drzavljanstvo: BiH
