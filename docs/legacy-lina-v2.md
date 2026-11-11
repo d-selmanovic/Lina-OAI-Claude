@@ -1,3 +1,7 @@
+---
+title: Übernahme aus Lina v2 (Gemini)
+---
+
 # Übernahme aus Lina v2 (Gemini)
 
 Quelle: `/Users/Agents/Lina JSI Gemini` (Git-Remote `d-selmanovic/Linav2-antigraphity`). Gemini 3.8 Live, FastAPI, FreeSWITCH, Airtable.

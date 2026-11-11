@@ -1,3 +1,7 @@
+---
+title: "Telefonie: LiveKit → FusionPBX → TG400 → SIM"
+---
+
 # Telefonie: LiveKit → FusionPBX → TG400 → SIM
 
 Stand 08.11.2026. Keine Passwörter in dieser Datei.

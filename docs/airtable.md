@@ -1,3 +1,7 @@
+---
+title: "Airtable: Schema, Pflichtunterlagen, Pre-Call-Fetch"
+---
+
 # Airtable: Schema, Pflichtunterlagen, Pre-Call-Fetch
 
 Stand: 05.11.2026. Schema per Airtable-Connector ausgelesen (nur Struktur, keine Datensätze).
