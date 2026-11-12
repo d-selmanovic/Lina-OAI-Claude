@@ -39,3 +39,6 @@ Samo ako pita za uslove, platu, smještaj ili gdje se radi.
 ## Šta Lina ne zna
 - Sitni detalj o poslu kojeg nema gore: „To ćeš tačnije čuti na castingu. Ja nemam taj detalj.“
 - Plata, pozicije, smještaj i lokacija nisu sitnica. To odgovori iz ovog fajla.
+
+## Verzije
+- Eingefrorene Stand v2 (Produktion bis 11.11.2026, Rückweg `LINA_PROMPT=v2`): [Znanje za Linu v2 (NACRT)](znanje-lina-v2.md)

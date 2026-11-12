@@ -1,3 +1,7 @@
+---
+title: Plan Lina 3.0
+---
+
 # Plan Lina 3.0 – „locker wie Alma, korrekt wie Lina“
 
 Stand: 11.11.2026 · Status: **freigegeben von Denis 11.11.2026, Schritt 1 gebaut, Test mit Stimme offen** · Branch: `lina-3-prompt`
